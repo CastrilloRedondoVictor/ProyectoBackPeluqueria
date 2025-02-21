@@ -15,11 +15,19 @@ namespace ProyectoBackPeluqueria.Controllers
 
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetInt32("idRol") == null)
+            {
+                return RedirectToAction("Denied", "Auth");
+            }
             return View();
         }
 
         public IActionResult Privacy()
         {
+            if (HttpContext.Session.GetInt32("idRol") == null)
+            {
+                return RedirectToAction("Denied", "Auth");
+            }
             return View();
         }
 

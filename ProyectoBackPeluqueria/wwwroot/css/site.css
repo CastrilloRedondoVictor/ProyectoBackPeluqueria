@@ -2,14 +2,12 @@ html {
   font-size: 14px;
 }
 
+
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
   }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
@@ -28,4 +26,30 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* Cambiar el fondo de las opciones cuando están seleccionadas */
+select.form-control option:checked,
+select.form-select option:checked {
+    background-color: #dc8a3e; /* Fondo naranja cuando se selecciona una opción */
+    color: #fff; /* Cambiar color de texto cuando la opción es seleccionada */
+}
+
+
+
+/* Estilo general para el contenedor con imagen de fondo */
+body {
+    background-image: url('https://img.freepik.com/foto-gratis/vista-superior-accesorios-concepto-bano_23-2148419437.jpg?t=st=1740130830~exp=1740134430~hmac=446bb8bcd4757d10263351c4ed23679a51f881ce36a4d6167dc7d23188180a77&w=1060'); /* Asegúrate de que la ruta sea correcta */
+    background-size: cover; /* Asegura que la imagen cubra todo el contenedor */
+    background-position: right; /* Mueve la imagen hacia la derecha en pantallas pequeñas */
+    background-attachment: fixed; /* Fija la imagen al hacer scroll */
+    min-height: 100vh; /* Hace que el contenedor ocupe al menos el alto completo de la pantalla */
+    padding: 20px;
+    border-radius: 10px;
+    padding-top: 75px;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.75);
+    padding: 25px;
 }
