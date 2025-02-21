@@ -15,13 +15,13 @@ namespace ProyectoBackPeluqueria.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string username, string email)
+        public IActionResult Login(string email, string password)
         {
-            if (username.ToLower() == "iris@gmail.com" && email == "123")
+            if (email.ToLower() == "iris@gmail.com" && password == "123")
             {
                 HttpContext.Session.SetInt32("idRol", 2);
                 return RedirectToAction("Index", "Home");
-            } else if(username.ToLower() == "victor@gmail.com" && email == "123")
+            } else if(email.ToLower() == "victor@gmail.com" && password == "123")
             {
                 HttpContext.Session.SetInt32("idRol", 1);
                 return RedirectToAction("Index", "Home");
