@@ -1,8 +1,36 @@
 ﻿@{
     ViewData["Title"] = "Reservas Page";
 }
+@model List<ReservaView>
 
 <div class="text-center">
     <h1 class="display-3 text-primary">Reservas</h1>
     <p class="text-secondary">Aquí se realizarán las reservas.</p>
 </div>
+
+<a asp-action="Create" class="btn btn-primary">Nueva Reserva</a>
+
+<table class="table table-striped mt-5">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Servicio</th>
+            <th>Fecha</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reserva in Model)
+        {
+            <tr>
+                @* <td>@reserva.ReservaID</td> *@
+                <td>@reserva.Cliente</td>
+                <td>@reserva.Servicio</td>
+                <td>@reserva.FechaHoraInicio.ToString("yyyy-MM-dd")</td>
+                <td>@reserva.FechaHoraInicio.ToString("HH:mm")</td>
+                <td>@reserva.FechaHoraFin.ToString("HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>
