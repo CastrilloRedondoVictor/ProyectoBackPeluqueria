@@ -24,7 +24,10 @@ namespace ProyectoBackPeluqueria.Controllers
             if (HttpContext.Session.GetInt32("idRol") == null)
             {
                 return RedirectToAction("Denied", "Auth");
-            }
+            } else if (HttpContext.Session.GetInt32("idRol") == 1)
+              {
+                return RedirectToAction("Index", "Home");
+              }
             var reservas = await _repository.ObtenerReservasClientesAsync();
             return View(reservas);
         }
