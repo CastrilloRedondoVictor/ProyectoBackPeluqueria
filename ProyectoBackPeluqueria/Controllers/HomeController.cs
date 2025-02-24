@@ -17,7 +17,7 @@ namespace ProyectoBackPeluqueria.Controllers
         {
             if (HttpContext.Session.GetInt32("idRol") == null)
             {
-                return RedirectToAction("Denied", "Auth");
+                return RedirectToAction("Login", "Auth");
             }
             return View();
         }
