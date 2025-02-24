@@ -52,6 +52,16 @@ namespace ProyectoBackPeluqueria.Repositories
             );
         }
 
+        public async Task<Usuario> FindUsuario(int usuarioId)
+        {
+            return await _context.Usuarios.FindAsync(usuarioId);
+        }
+
+        public async Task<Servicio> FindServicio(int servicioId)
+        {
+            return await _context.Servicios.FindAsync(servicioId);
+        }
+
         // Realizar compra
         public async Task RealizarCompraAsync(int clienteId, DataTable detallesCompra)
         {
