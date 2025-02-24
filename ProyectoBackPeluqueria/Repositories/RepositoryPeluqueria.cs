@@ -15,6 +15,14 @@ namespace ProyectoBackPeluqueria.Repositories
             _context = context;
         }
 
+    public async Task<Usuario> LoginAsync(string email, string password)
+        {
+            var consulta = from Data in _context.Usuarios
+                           where Data.Email == email && Data.Contrasena == password
+                           select Data;
+            return consulta.AsEnumerable().FirstOrDefault();
+        }
+
         // Obtener servicios
         public async Task<List<Servicio>> ObtenerServiciosAsync()
         {

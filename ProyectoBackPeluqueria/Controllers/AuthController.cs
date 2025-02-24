@@ -1,9 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProyectoBackPeluqueria.Models;
+using ProyectoBackPeluqueria.Repositories;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
     public class AuthController : Controller
     {
+        public RepositoryPeluqueria _repository;
+
+        public AuthController(RepositoryPeluqueria repository)
+        {
+            _repository = repository;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -15,18 +24,15 @@ namespace ProyectoBackPeluqueria.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        public async Task<IActionResult> Login(string email, string password)
         {
-            if (email.ToLower() == "iris@gmail.com" && password == "123")
+            Usuario usuario = await _repository.LoginAsync(email, password);
+            if (usuario != null)
             {
-                HttpContext.Session.SetInt32("idRol", 2);
+                HttpContext.Session.SetInt32("idRol", usuario.IdRolUsuario);
+                HttpContext.Session.SetInt32("idUsuario", usuario.Id);
                 return RedirectToAction("Index", "Home");
-            } else if(email.ToLower() == "victor@gmail.com" && password == "123")
-            {
-                HttpContext.Session.SetInt32("idRol", 1);
-                return RedirectToAction("Index", "Home");
-            }
-            else
+            } else
             {
                 ViewData["Error"] = "Usuario o contraseña incorrectos";
                 return View();

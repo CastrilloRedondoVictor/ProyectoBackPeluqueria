@@ -25,6 +25,9 @@ namespace ProyectoBackPeluqueria.Models
         [Column("Email")]
         public string Email { get; set; }
 
+        [Column("Contrasena")]
+        public string Contrasena { get; set; }
+
         [Column("ColorPelo")]
         public string ColorPelo { get; set; }
 
