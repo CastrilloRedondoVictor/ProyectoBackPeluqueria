@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using ProyectoBackPeluqueria.Data;
 using ProyectoBackPeluqueria.Models;
 using System.Data;
@@ -9,10 +10,12 @@ namespace ProyectoBackPeluqueria.Repositories
     public class RepositoryPeluqueria
     {
         private readonly AppDbContext _context;
+        private readonly string _connectionString;
 
-        public RepositoryPeluqueria(AppDbContext context)
+        public RepositoryPeluqueria(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _connectionString = configuration.GetConnectionString("SqlPeluqueria");
         }
 
     public async Task<Usuario> LoginAsync(string email, string password)
@@ -118,5 +121,99 @@ namespace ProyectoBackPeluqueria.Repositories
                 .FromSqlRaw("SELECT * FROM Vista_Reservas")
                 .ToListAsync();
         }
+
+
+        public async Task<(int diasAgregados, int diasExistentes)> AgregarDisponibilidadRangoAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            int diasAgregados = 0;
+            int diasExistentes = 0;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                for (var fecha = fechaInicio; fecha <= fechaFin; fecha = fecha.AddDays(1))
+                {
+                    // Saltar sábados y domingos
+                    if (fecha.DayOfWeek == DayOfWeek.Saturday || fecha.DayOfWeek == DayOfWeek.Sunday)
+                        continue;
+
+                    var command = new SqlCommand("AgregarDisponibilidad", connection)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+
+                    command.Parameters.AddWithValue("@Fecha", fecha);
+
+                    try
+                    {
+                        await command.ExecuteNonQueryAsync();
+                        diasAgregados++;
+                    }
+                    catch (SqlException ex)
+                    {
+                        if (ex.Number == 50000) // RAISERROR personalizado desde el procedimiento
+                            diasExistentes++;
+                        else
+                            throw; // Otros errores
+                    }
+                }
+            }
+
+            return (diasAgregados, diasExistentes);
+        }
+
+
+        public async Task<List<DateTime>> ObtenerDiasDisponibles()
+        {
+            var fechas = new List<DateTime>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand("ObtenerDiasDisponibles", connection){
+                        CommandType = CommandType.StoredProcedure
+                    })
+                {
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            fechas.Add(DateTime.Parse(reader["Fecha"].ToString()));
+                        }
+                    }
+                }
+            }
+            return fechas;
+        }
+
+        public async Task<List<(DateTime FechaInicio, DateTime FechaFin, string Servicio)>> ObtenerCitasConHoras()
+        {
+            var citas = new List<(DateTime FechaInicio, DateTime FechaFin, string Servicio)>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand("SELECT FechaHoraInicio, FechaHoraFin, Servicio FROM Vista_Reservas", connection))
+                {
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            // Añadir la fecha de inicio, fecha de fin y servicio como una tupla a la lista
+                            citas.Add((
+                                reader.GetDateTime(0), // FechaHoraInicio
+                                reader.GetDateTime(1), // FechaHoraFin
+                                reader.GetString(2)   // Servicio
+                            ));
+                        }
+                    }
+                }
+            }
+
+            return citas;
+        }
+
+
+
     }
 }

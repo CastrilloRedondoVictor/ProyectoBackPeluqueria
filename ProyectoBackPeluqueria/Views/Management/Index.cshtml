@@ -1,0 +1,357 @@
+﻿<div class="text-center">
+    <h1 class="display-3 text-primary">Bienvenido/a, @Context.Session.GetString("NombreUsuario")</h1>
+    <p class="text-center text-secondary">Aquí puedes ver tus citas y la información de tu perfil</p>
+</div>
+
+@if (Context.Session.GetInt32("idRol") == 2)
+{
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#disponibilidadModal">
+    Agregar Disponibilidad
+</button>
+
+    <div class="row mt-3">
+        <div class="col-lg-6 col-md-12 col-sm-12">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+}
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="disponibilidadModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Agregar Disponibilidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formDisponibilidad">
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-control" id="fechaInicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Fecha Fin</label>
+                        <input type="date" class="form-control" id="fechaFin" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cargar jQuery primero -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Cargar Moment.js antes de FullCalendar -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<!-- Ahora cargamos FullCalendar -->
+<script src="
+https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
+"></script>
+
+<script>
+    $(document).ready(function () {
+      $('#formDisponibilidad').submit(function (e) {
+        e.preventDefault();
+
+        const fechaInicio = $('#fechaInicio').val();
+        const fechaFin = $('#fechaFin').val();
+
+        console.log(fechaInicio, fechaFin);
+
+        if (!fechaInicio || !fechaFin) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Fechas incompletas',
+            text: 'Por favor, selecciona ambas fechas.',
+            confirmButtonColor: '#c68a54'
+          });
+          return;
+        }
+
+        $.ajax({
+          url: '/Management/AgregarRangoDisponibilidad',
+          type: 'POST',
+          data: { fechaInicio, fechaFin },
+          success: function (response) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Disponibilidad agregada',
+              text: `${response.diasAgregados} días agregados, ${response.diasExistentes} ya existían.`,
+              confirmButtonColor: '#c68a54'
+            }).then(() => {
+              $('#disponibilidadModal').modal('hide');
+            });
+          },
+          error: function () {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo agregar la disponibilidad.',
+              confirmButtonColor: '#c68a54'
+            });
+          }
+        });
+      });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth', // Cambia a timeGridDay o timeGridWeek
+            locale: 'es', // Español
+            selectable: true, // Permitir selección de fechas
+            //editable: true, // Permitir editar los eventos (ajustar duración, mover eventos)
+            // droppable: true, // Permitir arrastrar y soltar eventos (si es necesario)
+
+            // Cambiar los colores del calendario
+            themeSystem: 'bootstrap5', // Para usar el sistema de temas de Bootstrap 5
+
+            // Estilo del fondo del calendario
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridDay,listWeek,dayGridMonth'
+            },
+            // Cambiar de vista automáticamente
+            responsive: true,  // Habilitar la adaptación al tamaño de pantalla
+            views: {
+                timeGridDay: {
+                    // Personalizar vista diaria en pantallas pequeñas si es necesario
+                    eventLimit: 3  // Limitar el número de eventos visibles para que no se apilen
+                },
+                timeGridWeek: {
+                    eventLimit: 5  // Limitar los eventos para que no se apilen en una pantalla pequeña
+                },
+                dayGridMonth: {
+                    eventLimit: 6  // Limitar los eventos en la vista de mes
+                }
+            },
+
+            // Cargar eventos desde el backend
+            events: function (fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: '@Url.Action("ObtenerEventosCalendario", "Management")', // Llama al controlador
+                    type: 'GET',
+                    success: function (data) {
+                        var eventos = [];
+
+                        data.forEach(function (evento) {
+                            eventos.push({
+                                title: evento.title, // Título del evento (Servicio)
+                                start: evento.start, // Fecha de inicio
+                                end: evento.end, // Fecha de fin
+                                backgroundColor: "#dc8a3e", // Color de fondo
+                                borderColor: "#c07b2f", // Color del borde
+                                textColor: "white" // Color del texto
+                            });
+                        });
+
+                        successCallback(eventos);
+                    },
+                    error: function () {
+                        failureCallback();
+                    }
+                });
+            },
+
+            eventDidMount: function(info) {
+                // Coloca los estilos personalizados para los eventos
+                info.el.style.backgroundColor = "#dc8a3e"; // Color de fondo
+                info.el.style.borderColor = "#c07b2f"; // Color del borde
+                info.el.style.color = "white"; // Color del texto
+            },
+
+            // Mostrar solo el título del evento
+            eventContent: function (arg) {
+                return {
+                    html: arg.event.title // Solo el título, sin la hora
+                };
+            },
+
+             // Configuración de la duración de los eventos
+            slotDuration: '00:30:00', // Duración de cada celda (30 minutos)
+            slotMinTime: '09:00:00', // Mínima hora visible: 9 AM
+            slotMaxTime: '20:00:00', // Máxima hora visible: 8 PM
+            eventLimit: false, // Desactivar el límite de eventos
+
+            // Habilitar la edición de la duración de los eventos (arrastrar para cambiar duración)
+            eventDurationEditable: true,
+
+            // Interacción con los eventos (mover o redimensionar)
+            eventResize: function(info) {
+                Swal.fire({
+                    title: 'Evento ajustado',
+                    text: `Nuevo horario: Desde ${info.event.start.toLocaleString()} hasta ${info.event.end.toLocaleString()}`,
+                    icon: 'success',
+                    confirmButtonColor: '#c68a54'
+                });
+            },
+
+            // Cuando se hace clic en un evento
+            eventClick: function (info) {
+                Swal.fire({
+                    title: info.event.title,
+                    text: `Hora de inicio: ${info.event.start.toLocaleString()} - Hora de fin: ${info.event.end.toLocaleString()}`,
+                    icon: "info",
+                    confirmButtonColor: "#c68a54"
+                });
+            },
+
+            select: function (info) {
+                Swal.fire({
+                    title: "¿Agregar disponibilidad?",
+                    text: `Desde ${info.startStr} hasta ${info.endStr}`,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#c68a54",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Sí, agregar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("AgregarRangoDisponibilidad", "Management")',
+                            type: 'POST',
+                            data: { fechaInicio: info.startStr, fechaFin: info.endStr },
+                            success: function () {
+                                Swal.fire("¡Agregado!", "Las fechas han sido añadidas.", "success");
+                                calendar.refetchEvents(); // Recargar eventos
+                            },
+                            error: function () {
+                                Swal.fire("Error", "No se pudo agregar la disponibilidad.", "error");
+                            }
+                        });
+                    }
+                });
+            },
+            slotMinHeight: 80,
+            windowResize: function() {
+                if (window.innerWidth < 768) {
+                    // Cambia a 'listWeek' o 'timeGridDay' en dispositivos móviles
+                    calendar.changeView('listWeek');
+                } else {
+                    calendar.changeView('dayGridMonth');
+                }
+            },
+
+            // Ajuste de la vista semanal en pantallas pequeñas
+            eventClassNames: 'fc-responsive-event',
+
+            // Para que los botones se adapten al idioma
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            }
+        });
+
+        calendar.render();
+
+            calendar.on('windowResize', function() {
+        if (window.innerWidth < 768) {
+            calendar.changeView('timeGridDay');  // Vista diaria en pantallas pequeñas
+        } else {
+            calendar.changeView('dayGridMonth');  // Vista mensual en pantallas grandes
+        }
+    });
+    });
+</script>
+
+
+
+@* <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es', // Español
+            selectable: true, // Permitir selección de fechas
+            editable: false, // Evita que se editen eventos directamente
+
+            // Cargar eventos desde el backend
+            events: function (fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: '@Url.Action("ObtenerEventosCalendario", "Management")', // Llama a tu controlador
+                    type: 'GET',
+                    success: function (data) {
+                        var eventos = [];
+
+                        data.forEach(function (evento) {
+                            eventos.push({
+                                title: evento.tipo, // "Disponibilidad" o "Cita"
+                                start: evento.fecha,
+                                backgroundColor: evento.tipo === "Disponibilidad" ? "green" : "red",
+                                borderColor: evento.tipo === "Disponibilidad" ? "darkgreen" : "darkred",
+                                textColor: "white"
+                            });
+                        });
+
+                        successCallback(eventos);
+                    },
+                    error: function () {
+                        failureCallback();
+                    }
+                });
+            },
+
+            // Evento al seleccionar fechas
+            select: function (info) {
+                Swal.fire({
+                    title: "¿Agregar disponibilidad?",
+                    text: `Desde ${info.startStr} hasta ${info.endStr}`,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#c68a54",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Sí, agregar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("AgregarRangoDisponibilidad", "Management")',
+                            type: 'POST',
+                            data: { fechaInicio: info.startStr, fechaFin: info.endStr },
+                            success: function () {
+                                Swal.fire("¡Agregado!", "Las fechas han sido añadidas.", "success");
+                                calendar.refetchEvents(); // Recargar eventos
+                            },
+                            error: function () {
+                                Swal.fire("Error", "No se pudo agregar la disponibilidad.", "error");
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        calendar.render();
+    });
+</script> *@
+
+
+
+@* <style>
+    /* Fondo del modal blanco con opacidad */
+    .modal-content {
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        backdrop-filter: blur(5px); /* Efecto de desenfoque */
+    }
+
+    /* Oscurecer el fondo al abrir el modal */
+    .modal-backdrop.show {
+        opacity: 0.8;
+    }
+</style> *@

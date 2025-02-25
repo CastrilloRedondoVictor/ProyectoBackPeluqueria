@@ -31,6 +31,7 @@ namespace ProyectoBackPeluqueria.Controllers
             {
                 HttpContext.Session.SetInt32("idRol", usuario.IdRolUsuario);
                 HttpContext.Session.SetInt32("idUsuario", usuario.Id);
+                HttpContext.Session.SetString("NombreUsuario", usuario.Nombre);
                 return RedirectToAction("Index", "Home");
             } else
             {
