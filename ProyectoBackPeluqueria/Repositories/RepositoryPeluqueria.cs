@@ -209,9 +209,75 @@ namespace ProyectoBackPeluqueria.Repositories
                     }
                 }
             }
-
             return citas;
         }
+
+
+
+        public async Task<List<Servicio>> GetServiciosAsync()
+        {
+            return await _context.Servicios.ToListAsync();
+        }
+        public async Task InsertarServicioAsync(Servicio servicio)
+        {
+            _context.Servicios.Add(servicio);
+            await _context.SaveChangesAsync();
+        }
+        public async Task ActualizarServicioAsync(Servicio servicio)
+        {
+            _context.Servicios.Update(servicio);
+            await _context.SaveChangesAsync();
+        }
+        public async Task EliminarServicioAsync(int id)
+        {
+            var servicio = await _context.Servicios.FindAsync(id);
+            _context.Servicios.Remove(servicio);
+            await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<UsuarioView> FindUsuarioView(int usuarioId)
+        {
+            return await _context.VistaUsuarios.FindAsync(usuarioId);
+        }
+
+        public async Task<List<Reserva>> GetReservasUsuarioAsync(int usuarioId)
+        {
+            return await _context.Reservas
+                .Where(r => r.ClienteId == usuarioId)
+                .ToListAsync();
+        }
+        public async Task<Reserva> GetLastReservaUsuarioAsync(int usuarioId)
+        {
+            return await _context.Reservas
+                .Where(r => r.ClienteId == usuarioId)
+                .OrderByDescending(r => r.FechaHoraInicio)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Compra>> GetComprasUsuarioAsync(int usuarioId)
+        {
+            return await _context.Compras
+                .Where(c => c.ClienteId == usuarioId)
+                .ToListAsync();
+        }
+
+        public async Task<List<CompraDetalle>> GetDetallesUltimaCompraAsync(int usuarioId)
+        {
+            var ultimaCompra = await _context.Compras
+                .Where(c => c.ClienteId == usuarioId)
+                .OrderByDescending(c => c.Fecha)
+                .FirstOrDefaultAsync();
+
+            if (ultimaCompra == null)
+                return null;
+
+            return await _context.CompraDetalles
+                .Where(cd => cd.CompraId == ultimaCompra.Id)
+                .ToListAsync();
+        }
+
+
 
 
 

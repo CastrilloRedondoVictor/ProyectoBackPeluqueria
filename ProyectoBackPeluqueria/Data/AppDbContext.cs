@@ -17,6 +17,7 @@ namespace ProyectoBackPeluqueria.Data
         public DbSet<CompraDetalle> CompraDetalles { get; set; }
         public DbSet<HorarioDisponible> HorariosDisponibles { get; set; }
         public DbSet<ReservaView> VistaReservas { get; set; }
+        public DbSet<UsuarioView> VistaUsuarios { get; set; }
 
 
         // DbSets para vistas

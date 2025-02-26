@@ -15,6 +15,10 @@ namespace ProyectoBackPeluqueria.Models
         public string Nombre { get; set; }
 
         [Required]
+        [Column("Descripcion")]
+        public string Descripcion { get; set; }
+
+        [Required]
         [Column("DuracionMinutos")]
         public int DuracionMinutos { get; set; }
 

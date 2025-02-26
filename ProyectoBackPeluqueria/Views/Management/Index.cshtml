@@ -5,9 +5,18 @@
 
 @if (Context.Session.GetInt32("idRol") == 2)
 {
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#disponibilidadModal">
-    Agregar Disponibilidad
-</button>
+<div class="row">
+    <div class="col">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#disponibilidadModal">
+                Agregar Disponibilidad
+            </button>
+    </div>
+    <div class="col">
+            <a asp-controller="Servicios" asp-action="Index" class="btn btn-primary">
+                Gestionar servicios
+            </a>
+    </div>
+</div>
 
     <div class="row mt-3">
         <div class="col-lg-6 col-md-12 col-sm-12">
