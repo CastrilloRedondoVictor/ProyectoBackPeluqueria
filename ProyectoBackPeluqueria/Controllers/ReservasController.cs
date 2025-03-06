@@ -71,7 +71,7 @@ namespace ProyectoBackPeluqueria.Controllers
         await _repository.InsertarReservaAsync(clienteId, servicioId, fechaHora);
 
         Usuario cliente = await _repository.FindUsuario(clienteId);
-        Servicio servicio = await _repository.FindServicio(servicioId);
+        Servicio servicio = await _repository.FindServicioAsync(servicioId);
 
         await SendEmailAsync(cliente, servicio, fechaHora);
 

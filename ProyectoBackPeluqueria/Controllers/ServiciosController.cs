@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 
@@ -33,15 +34,29 @@ namespace ProyectoBackPeluqueria.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            Servicio servicio = await this._repository.FindServicio(id);
+            Servicio servicio = await this._repository.FindServicioAsync(id);
             return View(servicio);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(Servicio servicio)
         {
-            await this._repository.ActualizarServicioAsync(servicio);
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Asegurar que el precio se interpreta correctamente
+                    servicio.Precio = Convert.ToDecimal(servicio.Precio, System.Globalization.CultureInfo.InvariantCulture);
+
+                    await this._repository.ActualizarServicioAsync(servicio);
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al guardar el servicio.");
+                }
+            }
+            return View(servicio);
         }
 
         public async Task<IActionResult> Delete(int id)
