@@ -66,6 +66,12 @@ namespace ProyectoBackPeluqueria.Controllers
             return Json(eventos);
         }
 
+        public IActionResult LogOut()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }
+
 
 
     }

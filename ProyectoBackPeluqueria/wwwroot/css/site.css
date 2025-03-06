@@ -291,3 +291,13 @@ body {
     height: 5rem;
 }
 
+/* Para pantallas pequeñas */
+@media (max-width: 576px) {
+    .button {
+        width: 100%;
+    }
+
+    .svg-icon {
+        font-size: 1em;
+    }
+}
