@@ -23,6 +23,11 @@ namespace ProyectoBackPeluqueria.Controllers
             int idUsuario = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             Usuario usuario = await _repository.FindUsuario(idUsuario);
 
+            Reserva proximaReserva = await _repository.GetProximaReservaUsuarioAsync(idUsuario);
+
+            ViewData["ProximaReserva"] = proximaReserva;
+            ViewData["ServicioProximaReserva"] = proximaReserva != null ? await _repository.GetServicioReservaAsync(proximaReserva.ServicioId) : null;
+
             return View(usuario);
         }
         public async Task<IActionResult> EditProfile(int id)

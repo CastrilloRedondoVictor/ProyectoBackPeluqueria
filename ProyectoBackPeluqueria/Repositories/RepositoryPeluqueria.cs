@@ -254,6 +254,21 @@ namespace ProyectoBackPeluqueria.Repositories
                 .Where(r => r.ClienteId == usuarioId)
                 .ToListAsync();
         }
+
+        public async Task<Reserva> GetProximaReservaUsuarioAsync(int usuarioId)
+        {
+            return await _context.Reservas
+                .Where(r => r.ClienteId == usuarioId && r.FechaHoraInicio >= DateTime.Now)
+                .OrderBy(r => r.FechaHoraInicio)
+                .FirstOrDefaultAsync();
+        }
+
+
+        public async Task<string> GetServicioReservaAsync(int servicioId)
+        {
+            Servicio servicio = await _context.Servicios.FindAsync(servicioId);
+            return servicio.Nombre;
+        }
         public async Task<Reserva> GetLastReservaUsuarioAsync(int usuarioId)
         {
             return await _context.Reservas
