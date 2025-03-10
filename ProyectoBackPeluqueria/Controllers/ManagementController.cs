@@ -18,12 +18,15 @@ namespace ProyectoBackPeluqueria.Controllers
         }
 
         [AuthorizeUsers]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            int idUsuario = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            Usuario usuario = await _repository.FindUsuario(idUsuario);
+            if(id == null)
+            {
+                id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            }
+            Usuario usuario = await _repository.FindUsuario(id.Value);
 
-            Reserva proximaReserva = await _repository.GetProximaReservaUsuarioAsync(idUsuario);
+            Reserva proximaReserva = await _repository.GetProximaReservaUsuarioAsync(id.Value);
 
             ViewData["ProximaReserva"] = proximaReserva;
             ViewData["ServicioProximaReserva"] = proximaReserva != null ? await _repository.GetServicioReservaAsync(proximaReserva.ServicioId) : null;
@@ -71,6 +74,7 @@ namespace ProyectoBackPeluqueria.Controllers
             // Añadir cada cita al evento, incluyendo la fecha de inicio, fecha de fin y el servicio
             eventos.AddRange(citas.Select(c => new
             {
+                id = c.ReservaId, // ID de la cita
                 title = c.Servicio,  // El título será el nombre del servicio
                 start = c.FechaInicio.ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha de inicio en formato ISO
                 end = c.FechaFin.ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha de fin en formato ISO
@@ -84,6 +88,26 @@ namespace ProyectoBackPeluqueria.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Auth");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerDiasDisponibles()
+        {
+            var diasDisponibles = await _repository.ObtenerDiasDisponibles();
+            return Json(diasDisponibles.Select(d => new { start = d.ToString("yyyy-MM-dd") }));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDetallesReserva(int id)
+        {
+            var reserva = await _repository.FindReservaAsync(id);
+            if (reserva == null)
+            {
+                return NotFound();
+            }
+
+            return Json(reserva);
+        }
+
 
 
 

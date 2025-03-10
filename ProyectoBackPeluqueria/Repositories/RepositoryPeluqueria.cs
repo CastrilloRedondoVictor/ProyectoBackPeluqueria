@@ -124,6 +124,11 @@ namespace ProyectoBackPeluqueria.Repositories
                 .ToListAsync();
         }
 
+        public async Task<ReservaView> FindReservaAsync(int reservaId)
+        {
+            return await _context.VistaReservas.FindAsync(reservaId);
+        }
+
 
         public async Task<(int diasAgregados, int diasExistentes)> AgregarDisponibilidadRangoAsync(DateTime fechaInicio, DateTime fechaFin)
         {
@@ -134,7 +139,7 @@ namespace ProyectoBackPeluqueria.Repositories
             {
                 await connection.OpenAsync();
 
-                for (var fecha = fechaInicio.AddDays(-1); fecha <= fechaFin; fecha = fecha.AddDays(1))
+                for (var fecha = fechaInicio; fecha <= fechaFin; fecha = fecha.AddDays(1))
                 {
                     // Saltar sábados y domingos
                     if (fecha.DayOfWeek == DayOfWeek.Saturday || fecha.DayOfWeek == DayOfWeek.Sunday)
@@ -188,14 +193,14 @@ namespace ProyectoBackPeluqueria.Repositories
             return fechas;
         }
 
-        public async Task<List<(DateTime FechaInicio, DateTime FechaFin, string Servicio)>> ObtenerCitasConHoras()
+        public async Task<List<(DateTime FechaInicio, DateTime FechaFin, string Servicio, int ReservaId)>> ObtenerCitasConHoras()
         {
-            var citas = new List<(DateTime FechaInicio, DateTime FechaFin, string Servicio)>();
+            var citas = new List<(DateTime FechaInicio, DateTime FechaFin, string Servicio, int ReservaId)>();
 
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new SqlCommand("SELECT FechaHoraInicio, FechaHoraFin, Servicio FROM Vista_Reservas", connection))
+                using (var command = new SqlCommand("SELECT FechaHoraInicio, FechaHoraFin, Servicio, ReservaID FROM Vista_Reservas", connection))
                 {
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -205,7 +210,8 @@ namespace ProyectoBackPeluqueria.Repositories
                             citas.Add((
                                 reader.GetDateTime(0), // FechaHoraInicio
                                 reader.GetDateTime(1), // FechaHoraFin
-                                reader.GetString(2)   // Servicio
+                                reader.GetString(2),   // Servicio
+                                reader.GetInt32(3)    // ReservaID
                             ));
                         }
                     }
