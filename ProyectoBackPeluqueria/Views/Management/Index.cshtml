@@ -4,6 +4,7 @@
 @{
     Reserva proximaReserva = (Reserva)ViewData["ProximaReserva"];
     string servicioProximaReserva = (string)ViewData["ServicioProximaReserva"];
+    string fechaHoy = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToLongDateString();
 }
 
 <div class="text-center">
@@ -51,6 +52,7 @@
 
         <!-- Calendario: Aparece después de los botones en dispositivos móviles -->
         <div class="col-lg-6 col-md-12 col-sm-12 mb-5 order-2 order-sm-1">
+            <h3 class="text-center text-primary">Hoy es @fechaHoy</h3>
             <div id="calendar" class="border rounded shadow-sm p-3"></div>
         </div>
 
@@ -187,14 +189,37 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
 </script>
 
 <script>
+
+
+
+             function cargarDiasDisponibles(calendar) {
+        $.ajax({
+            url: '/Management/ObtenerDiasDisponibles',
+            type: 'GET',
+            success: function (data) {
+                setTimeout(() => {
+                    data.forEach(function (fecha) {
+                        let diaElemento = document.querySelector(`[data-date="${fecha.start}"]`);
+                        if (diaElemento) {
+                            diaElemento.style.backgroundColor = 'rgba(0, 255, 0, 0.05)'; // Verde transparente
+                        }
+                    });
+                }, 100);
+            },
+            error: function () {
+                console.error("No se pudieron cargar los días disponibles.");
+            }
+        });
+    }
+
+
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth', // Cambia a timeGridDay o timeGridWeek
             locale: 'es', // Español
+            firstDay: 1, // Lunes como primer día de la semana
             selectable: true, // Permitir selección de fechas
-            //editable: true, // Permitir editar los eventos (ajustar duración, mover eventos)
-            // droppable: true, // Permitir arrastrar y soltar eventos (si es necesario)
 
             // Cambiar los colores del calendario
             themeSystem: 'bootstrap5', // Para usar el sistema de temas de Bootstrap 5
@@ -230,6 +255,7 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
 
                         data.forEach(function (evento) {
                             eventos.push({
+                                id: evento.id, // ID del evento
                                 title: evento.title, // Título del evento (Servicio)
                                 start: evento.start, // Fecha de inicio
                                 end: evento.end, // Fecha de fin
@@ -240,6 +266,7 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                         });
 
                         successCallback(eventos);
+                        cargarDiasDisponibles(calendar);
                     },
                     error: function () {
                         failureCallback();
@@ -280,15 +307,38 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                 });
             },
 
-            // Cuando se hace clic en un evento
-            eventClick: function (info) {
+                // Cuando se hace clic en un evento
+                eventClick: function (info) {
+        console.log(info.event.id); // Verifica que el ID es correcto
+        $.ajax({
+            url: `/Management/GetDetallesReserva?id=${info.event.id}`, // Ruta del controlador
+            type: 'GET',
+            success: function (reserva) {
                 Swal.fire({
-                    title: info.event.title,
-                    text: `Hora de inicio: ${info.event.start.toLocaleString()} - Hora de fin: ${info.event.end.toLocaleString()}`,
+                    title: "Detalles de la Reserva",
+                    html: `
+                        <strong>Cliente:</strong> ${reserva.cliente}<br>
+                        <strong>Servicio:</strong> ${reserva.servicio}<br>
+                        <strong>Fecha:</strong> ${new Date(reserva.fechaHoraInicio).toLocaleDateString()}<br>
+                        <strong>Hora de inicio:</strong> ${new Date(reserva.fechaHoraInicio).toLocaleTimeString()}<br>
+                        <strong>Hora de fin:</strong> ${new Date(reserva.fechaHoraFin).toLocaleTimeString()}
+                    `,
                     icon: "info",
                     confirmButtonColor: "#c68a54"
                 });
             },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText); // Ver detalles del error
+                Swal.fire({
+                    title: "Error",
+                    text: "No se pudo obtener la información de la reserva.",
+                    icon: "error",
+                    confirmButtonColor: "#c68a54"
+                });
+            }
+        });
+    },
+
 
             select: function (info) {
                 Swal.fire({
@@ -349,6 +399,8 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                 day: 'Día'
             }
         });
+
+        cargarDiasDisponibles(calendar);
 
         calendar.render();
 
