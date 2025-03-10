@@ -28,6 +28,7 @@ namespace ProyectoBackPeluqueria.Repositories
 
         public async Task RegisterAsync(Usuario usuario)
         {
+            usuario.IdRolUsuario = 1; // Rol de cliente
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
         }
