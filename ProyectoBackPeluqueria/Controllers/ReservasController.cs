@@ -4,6 +4,7 @@ using ProyectoBackPeluqueria.Repositories;
 using System.Net.Mail;
 using System.Net;
 using System.Runtime.Intrinsics.X86;
+using ProyectoBackPeluqueria.Filters;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
@@ -19,26 +20,17 @@ namespace ProyectoBackPeluqueria.Controllers
             _configuration = configuration;
         }
 
+        [AuthorizeUsers]
         public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetInt32("idRol") == null)
-            {
-                return RedirectToAction("Denied", "Auth");
-            } else if (HttpContext.Session.GetInt32("idRol") == 1)
-              {
-                return RedirectToAction("Index", "Home");
-              }
             var reservas = await _repository.ObtenerReservasClientesAsync();
             return View(reservas);
         }
 
 
+        [AuthorizeUsers]
         public async Task<IActionResult> Create()
         {
-            if (HttpContext.Session.GetInt32("idRol") == null)
-            {
-                return RedirectToAction("Denied", "Auth");
-            }
             var clientes = await _repository.GetClientesAsync();
             var servicios = await _repository.ObtenerServiciosAsync();
             ViewData["Clientes"] = clientes;

@@ -1,32 +1,82 @@
-﻿<div class="text-center">
-    <h1 class="display-3 text-primary">Bienvenido/a, @Context.Session.GetString("NombreUsuario")</h1>
+﻿@using System.Security.Claims
+@model Usuario
+
+<div class="text-center">
+    <h1 class="display-3 text-primary">Bienvenido/a, @User.FindFirstValue(ClaimTypes.Name)</h1>
     <p class="text-center text-secondary">Aquí puedes ver tus citas y la información de tu perfil</p>
 </div>
 
-@if (Context.Session.GetInt32("idRol") == 2)
-{
-<div class="row">
-    <div class="col">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#disponibilidadModal">
-                Agregar Disponibilidad
-            </button>
-    </div>
-    <div class="col">
-            <a asp-controller="Servicios" asp-action="Index" class="btn btn-primary">
-                Gestionar servicios
-            </a>
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card shadow-lg rounded" style="background-color: rgba(220, 138, 62, 0.1); border: 1px solid rgba(220, 138, 62, 0.3);">
+            <div class="card-body">
+                <h5 class="card-title" style="color: #dc8a3e;">Información de perfil</h5>
+                <p class="card-text"><strong>Nombre:</strong> @Model.Nombre @Model.Apellidos</p>
+                <p class="card-text"><strong>Correo:</strong> @Model.Email</p>
+                <p class="card-text"><strong>Teléfono:</strong> @Model.Telefono</p>
+            </div>
+        </div>
     </div>
 </div>
 
+
+
+@if (User.IsInRole("Admin"))
+{
     <div class="row mt-3">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <div id="calendar"></div>
+
+        <!-- Calendario: Aparece después de los botones en dispositivos móviles -->
+        <div class="col-lg-6 col-md-12 col-sm-12 mb-5 order-2 order-sm-1">
+            <div id="calendar" class="border rounded shadow-sm p-3"></div>
         </div>
+
+        <!-- Botones (Cajas) -->
+        <div class="col-lg-6 col-md-12 col-sm-12 order-1 order-sm-2">
+
+            <!-- Caja 1: Gestionar Productos (Redirige a una página) -->
+            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                <a href="/Ruta/De/Tu/Pagina" class="carta">
+                    <div class="text">
+                        <span>Gestionar Productos</span>
+                        <p class="subtitle">Aquí puedes agregar, editar y eliminar productos.</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Caja 2: Gestionar Servicios (Abre un Modal) -->
+            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                <a asp-controller="Servicios" asp-action="Index" class="carta">
+                    <div class="text">
+                        <span>Gestionar Servicios</span>
+                        <p class="subtitle">Gestiona todos los servicios que ofreces.</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Caja 3: Gestionar Clientes (Redirige a una página) -->
+            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                <a href="/Ruta/De/Tu/Pagina" class="carta">
+                    <div class="text">
+                        <span>Gestionar Clientes</span>
+                        <p class="subtitle">Consulta y edita la información de tus clientes.</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Caja 4: Agregar Disponibilidad (Abre un Modal) -->
+            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                <div data-bs-toggle="modal" data-bs-target="#disponibilidadModal" class="carta">
+                    <div class="text">
+                        <span>Agregar disponibilidad</span>
+                        <p class="subtitle">Agrega tu disponibilidad para los servicios.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
 }
-
-
 
 
 <!-- Modal -->
@@ -55,6 +105,7 @@
 </div>
 
 
+
 <!-- Cargar jQuery primero -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -73,8 +124,6 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
 
         const fechaInicio = $('#fechaInicio').val();
         const fechaFin = $('#fechaFin').val();
-
-        console.log(fechaInicio, fechaFin);
 
         if (!fechaInicio || !fechaFin) {
           Swal.fire({
@@ -230,15 +279,26 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '@Url.Action("AgregarRangoDisponibilidad", "Management")',
+                            url: '/Management/AgregarRangoDisponibilidad',
                             type: 'POST',
                             data: { fechaInicio: info.startStr, fechaFin: info.endStr },
-                            success: function () {
-                                Swal.fire("¡Agregado!", "Las fechas han sido añadidas.", "success");
-                                calendar.refetchEvents(); // Recargar eventos
+                            success: function (response) {
+                              Swal.fire({
+                                icon: 'success',
+                                title: 'Disponibilidad agregada',
+                                text: `${response.diasAgregados} días agregados, ${response.diasExistentes} ya existían.`,
+                                confirmButtonColor: '#c68a54'
+                              }).then(() => {
+                                calendar.refetchEvents();
+                              });
                             },
                             error: function () {
-                                Swal.fire("Error", "No se pudo agregar la disponibilidad.", "error");
+                              Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudo agregar la disponibilidad.',
+                                confirmButtonColor: '#c68a54'
+                              });
                             }
                         });
                     }
@@ -280,87 +340,99 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
 
 
 
-@* <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'es', // Español
-            selectable: true, // Permitir selección de fechas
-            editable: false, // Evita que se editen eventos directamente
-
-            // Cargar eventos desde el backend
-            events: function (fetchInfo, successCallback, failureCallback) {
-                $.ajax({
-                    url: '@Url.Action("ObtenerEventosCalendario", "Management")', // Llama a tu controlador
-                    type: 'GET',
-                    success: function (data) {
-                        var eventos = [];
-
-                        data.forEach(function (evento) {
-                            eventos.push({
-                                title: evento.tipo, // "Disponibilidad" o "Cita"
-                                start: evento.fecha,
-                                backgroundColor: evento.tipo === "Disponibilidad" ? "green" : "red",
-                                borderColor: evento.tipo === "Disponibilidad" ? "darkgreen" : "darkred",
-                                textColor: "white"
-                            });
-                        });
-
-                        successCallback(eventos);
-                    },
-                    error: function () {
-                        failureCallback();
-                    }
-                });
-            },
-
-            // Evento al seleccionar fechas
-            select: function (info) {
-                Swal.fire({
-                    title: "¿Agregar disponibilidad?",
-                    text: `Desde ${info.startStr} hasta ${info.endStr}`,
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonColor: "#c68a54",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Sí, agregar",
-                    cancelButtonText: "Cancelar"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '@Url.Action("AgregarRangoDisponibilidad", "Management")',
-                            type: 'POST',
-                            data: { fechaInicio: info.startStr, fechaFin: info.endStr },
-                            success: function () {
-                                Swal.fire("¡Agregado!", "Las fechas han sido añadidas.", "success");
-                                calendar.refetchEvents(); // Recargar eventos
-                            },
-                            error: function () {
-                                Swal.fire("Error", "No se pudo agregar la disponibilidad.", "error");
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-        calendar.render();
-    });
-</script> *@
-
-
-
-@* <style>
-    /* Fondo del modal blanco con opacidad */
-    .modal-content {
-        background-color: rgba(255, 255, 255, 0.5);
-        border-radius: 10px;
-        backdrop-filter: blur(5px); /* Efecto de desenfoque */
+<style>
+    .carta {
+        width: 100%;
+        height: auto;
+        border-radius: 15px;
+        background: #dc8a3e;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        margin: 15px;
+        transition: all .5s ease;
+                text-decoration: none;
     }
 
-    /* Oscurecer el fondo al abrir el modal */
-    .modal-backdrop.show {
-        opacity: 0.8;
+        .carta:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        .carta::before {
+            content: "";
+            height: 100px;
+            width: 100px;
+            position: absolute;
+            top: -40%;
+            left: -20%;
+            border-radius: 50%;
+            border: 35px solid rgba(255, 255, 255, 0.102);
+            transition: all .8s ease;
+            filter: blur(.5rem);
+        }
+
+    .text {
+        flex-grow: 1;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        color: white;
+        font-weight: 900;
+        font-size: 1.2em;
     }
-</style> *@
+
+    .subtitle {
+        margin-top: 3px;
+        font-size: .8em;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .icons {
+        display: flex;
+        flex-wrap: wrap; /* Permite que los botones se acomoden si no caben */
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        border-radius: 0px 0px 15px 15px;
+        overflow: hidden;
+    }
+
+    .button {
+        border: none;
+        flex: 1;
+        min-width: 60px;
+        max-width: 100px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease-in-out; /* Transición suave */
+        text-decoration: none;
+    }
+
+    .svg-icon {
+        font-size: 1.2em;
+        color: white;
+        transition: color 0.3s ease-in-out; /* Cambio de color suave */
+    }
+
+    .button:hover {
+        background-color: white; /* Mantener el fondo */
+    }
+
+        .button:hover .svg-icon {
+            color: #dc8a3e; /* Cambiar el color del ícono */
+        }
+
+    .carta:hover::before {
+        width: 140px;
+        height: 140px;
+        top: -30%;
+        left: 50%;
+        filter: blur(0rem);
+    }
+</style>

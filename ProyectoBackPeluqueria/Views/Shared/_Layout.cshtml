@@ -15,7 +15,7 @@
 </head>
 <body>
 
-    @if (Context.Session.GetInt32("idRol") != null){
+    @if (User.Identity.IsAuthenticated){
         <header>
             <!-- Navbar fija en la parte superior con fondo claro -->
             <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top">
@@ -30,7 +30,7 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                             </li>
-                            @if (Context.Session.GetInt32("idRol") == 2)
+                            @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Reservas" asp-action="Index">Reservas</a>
@@ -43,7 +43,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Management" asp-action="Index">Administración</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-danger" asp-area="" asp-controller="Management" asp-action="Logout">Cerrar Sesión</a>
+                                <a href="javascript:void(0);" class="nav-link text-danger" onclick="confirmarLogout()">Cerrar Sesión</a>
                             </li>
                         </ul>
                     </div>
@@ -69,6 +69,26 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        function confirmarLogout() {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Tu sesión se cerrará y perderás el acceso.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, cerrar sesión",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/Management/Logout"; // Ruta a tu Logout
+                }
+            });
+        }
+    </script>
+
 </body>
 </html>
  
