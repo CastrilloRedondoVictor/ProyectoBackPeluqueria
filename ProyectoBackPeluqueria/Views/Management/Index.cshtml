@@ -81,7 +81,7 @@
 
             <!-- Caja 3: Gestionar Clientes (Redirige a una página) -->
             <div class="col-10 offset-1 d-flex justify-content-center mb-4">
-                <a href="/Ruta/De/Tu/Pagina" class="carta">
+                <a asp-controller="Clientes" asp-action="Index" class="carta">
                     <div class="text">
                         <span>Gestionar Clientes</span>
                         <p class="subtitle">Consulta y edita la información de tus clientes.</p>
@@ -309,7 +309,6 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
 
                 // Cuando se hace clic en un evento
                 eventClick: function (info) {
-        console.log(info.event.id); // Verifica que el ID es correcto
         $.ajax({
             url: `/Management/GetDetallesReserva?id=${info.event.id}`, // Ruta del controlador
             type: 'GET',
@@ -340,44 +339,59 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
     },
 
 
-            select: function (info) {
-                Swal.fire({
-                    title: "¿Agregar disponibilidad?",
-                    text: `Desde ${info.startStr} hasta ${info.endStr}`,
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonColor: "#c68a54",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Sí, agregar",
-                    cancelButtonText: "Cancelar"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/Management/AgregarRangoDisponibilidad',
-                            type: 'POST',
-                            data: { fechaInicio: info.startStr, fechaFin: info.endStr },
-                            success: function (response) {
-                              Swal.fire({
-                                icon: 'success',
-                                title: 'Disponibilidad agregada',
-                                text: `${response.diasAgregados} días agregados, ${response.diasExistentes} ya existían.`,
-                                confirmButtonColor: '#c68a54'
-                              }).then(() => {
-                                calendar.refetchEvents();
-                              });
-                            },
-                            error: function () {
-                              Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudo agregar la disponibilidad.',
-                                confirmButtonColor: '#c68a54'
-                              });
-                            }
+                select: function (info) {
+
+        // Convertir las cadenas de fecha a objetos Date
+        let startDate = new Date(info.startStr);
+        let endDate = new Date(info.endStr);
+
+        // Restar un día a la fecha de finalización
+        endDate.setDate(endDate.getDate() - 1);
+
+        // Mostrar la alerta con las fechas en formato adecuado
+        Swal.fire({
+            title: "¿Agregar disponibilidad?",
+            text: startDate.getDate() == endDate.getDate() ? `Para el día ${startDate.toLocaleDateString()}` : `Desde el ${startDate.toLocaleDateString()} hasta el ${endDate.toLocaleDateString()}`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#c68a54",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, agregar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Convertir las fechas a formato ISO para enviarlas al backend
+                const startISO = startDate.toISOString();
+                const endISO = endDate.toISOString();
+
+                // Realizar la petición AJAX
+                $.ajax({
+                    url: '/Management/AgregarRangoDisponibilidad',
+                    type: 'POST',
+                    data: { fechaInicio: startISO, fechaFin: endISO }, // Enviamos las fechas en formato ISO
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Disponibilidad agregada',
+                            text: `${response.diasAgregados} días agregados, ${response.diasExistentes} ya existían.`,
+                            confirmButtonColor: '#c68a54'
+                        }).then(() => {
+                            calendar.refetchEvents();
+                        });
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo agregar la disponibilidad.',
+                            confirmButtonColor: '#c68a54'
                         });
                     }
                 });
-            },
+            }
+        });
+    },
+
             slotMinHeight: 80,
             windowResize: function() {
                 if (window.innerWidth < 768) {

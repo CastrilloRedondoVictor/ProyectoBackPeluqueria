@@ -73,8 +73,16 @@ namespace ProyectoBackPeluqueria.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(Usuario usuario)
+        public async Task<IActionResult> Register(Usuario usuario, string adminCode)
         {
+            if (!string.IsNullOrEmpty(adminCode) && adminCode == "Taj@mar365")
+            {
+                usuario.IdRolUsuario = 2; // Administrador
+            }
+            else
+            {
+                usuario.IdRolUsuario = 1; // Usuario normal
+            }
             string iniciales = GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
             // Paso 4
@@ -112,7 +120,7 @@ namespace ProyectoBackPeluqueria.Controllers
 
 
 
-        private string GetIniciales(string nombre)
+        public static string GetIniciales(string nombre)
         {
             // Paso 1
             string[] palabras = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -131,7 +139,7 @@ namespace ProyectoBackPeluqueria.Controllers
             return iniciales;
         }
 
-        private byte[] GenerarAvatar(string iniciales, string colorHex)
+        public static byte[] GenerarAvatar(string iniciales, string colorHex)
         {
             // Dimensiones de la imagen
             int ancho = 150, alto = 150;

@@ -33,11 +33,12 @@ namespace ProyectoBackPeluqueria.Controllers
 
             return View(usuario);
         }
-        public async Task<IActionResult> EditProfile(int id)
-        {
-            Usuario usuario = await _repository.FindUsuario(id);
-            return View(usuario);
-        }
+        //public async Task<IActionResult> EditProfile(int id)
+
+        //{
+        //    Usuario usuario = await _repository.FindUsuario(id);
+        //    return View(usuario);
+        //}
 
         [HttpPost]
         public async Task<IActionResult> AgregarRangoDisponibilidad(DateTime fechaInicio, DateTime fechaFin)

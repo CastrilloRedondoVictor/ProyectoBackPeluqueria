@@ -28,7 +28,6 @@ namespace ProyectoBackPeluqueria.Repositories
 
         public async Task RegisterAsync(Usuario usuario)
         {
-            usuario.IdRolUsuario = 1; // Rol de cliente
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
         }
@@ -75,6 +74,12 @@ namespace ProyectoBackPeluqueria.Repositories
             return await _context.Usuarios.FindAsync(usuarioId);
         }
 
+        public async Task UpdateUsuarioAsync(Usuario usuario)
+        {
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+        }
+
         // Realizar compra
         public async Task RealizarCompraAsync(int clienteId, DataTable detallesCompra)
         {
@@ -107,13 +112,6 @@ namespace ProyectoBackPeluqueria.Repositories
             return await _context.HorariosDisponibles
                 .FromSqlRaw("EXEC ObtenerDiasYHorasDisponibles @ServicioId",
                     new SqlParameter("@ServicioId", servicioId))
-                .ToListAsync();
-        }
-
-        public async Task<List<Usuario>> GetClientesAsync()
-        {
-            return await _context.Usuarios
-                .FromSqlRaw("SELECT * FROM Usuarios WHERE IdRolUsuario = 1")
                 .ToListAsync();
         }
 
@@ -253,6 +251,11 @@ namespace ProyectoBackPeluqueria.Repositories
         public async Task<UsuarioView> FindUsuarioView(int usuarioId)
         {
             return await _context.VistaUsuarios.FindAsync(usuarioId);
+        }
+
+        public async Task<List<Usuario>> GetClientesAsync()
+        {
+            return await _context.Usuarios.Where(u => u.IdRolUsuario == 1).ToListAsync();
         }
 
         public async Task<List<Reserva>> GetReservasUsuarioAsync(int usuarioId)
