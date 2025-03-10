@@ -1,0 +1,74 @@
+﻿<div class="text-center">
+    <h1 class="display-3 text-primary">Registro</h1>
+    <p class="text-secondary">Crea una cuenta para acceder a la aplicación</p>
+</div>
+
+<form method="post" class="mt-3 p-4">
+    <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" name="nombre" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label for="apellidos" class="form-label">Apellidos</label>
+        <input type="text" name="apellidos" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <input type="text" name="telefono" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label for="contrasena" class="form-label">Contraseña</label>
+        <input type="password" name="contrasena" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label for="colorPelo" class="form-label">Color de Pelo</label>
+        <input type="text" name="colorPelo" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label for="imagen" class="form-label">URL de Imagen</label>
+        <input type="text" name="imagen" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary w-100 mt-3">Registrarse</button>
+</form>
+
+<h4 class="text-danger">@ViewData["error"]</h4>
+
+<a asp-action="Login" class="btn btn-link">¿Ya tienes una cuenta? Inicia sesión</a>
+
+
+<style>
+    .container {
+        max-width: 600px;
+        margin-top: 50px;
+    }
+
+    .form-select {
+        font-size: 1.1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .shadow-lg {
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    h2 {
+        font-family: 'Arial', sans-serif;
+    }
+</style>

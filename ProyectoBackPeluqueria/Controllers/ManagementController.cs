@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using ProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
+using ProyectoBackPeluqueria.Filters;
+using System.Security.Claims;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
@@ -13,9 +17,13 @@ namespace ProyectoBackPeluqueria.Controllers
             _repository = repository;
         }
 
-        public IActionResult Index()
+        [AuthorizeUsers]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            int idUsuario = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            Usuario usuario = await _repository.FindUsuario(idUsuario);
+
+            return View(usuario);
         }
         public async Task<IActionResult> EditProfile(int id)
         {
@@ -66,11 +74,12 @@ namespace ProyectoBackPeluqueria.Controllers
             return Json(eventos);
         }
 
-        public IActionResult LogOut()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Auth");
         }
+
 
 
 

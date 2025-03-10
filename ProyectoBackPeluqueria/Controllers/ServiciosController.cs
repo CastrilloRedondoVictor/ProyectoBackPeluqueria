@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProyectoBackPeluqueria.Filters;
 using ProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 
@@ -14,12 +15,14 @@ namespace ProyectoBackPeluqueria.Controllers
             this._repository = repository;
         }
 
+        [AuthorizeUsers]
         public async Task<IActionResult> Index()
         {
             List<Servicio> servicios = await this._repository.GetServiciosAsync();
             return View(servicios);
         }
 
+        [AuthorizeUsers]
         public async Task<IActionResult> Create()
         {
             return View();
@@ -32,6 +35,7 @@ namespace ProyectoBackPeluqueria.Controllers
             return RedirectToAction("Index");
         }
 
+        [AuthorizeUsers]
         public async Task<IActionResult> Edit(int id)
         {
             Servicio servicio = await this._repository.FindServicioAsync(id);

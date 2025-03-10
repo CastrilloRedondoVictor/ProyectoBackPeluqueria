@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using ProyectoBackPeluqueria.Filters;
 using ProyectoBackPeluqueria.Models;
 
 namespace ProyectoBackPeluqueria.Controllers
@@ -13,21 +14,15 @@ namespace ProyectoBackPeluqueria.Controllers
             _logger = logger;
         }
 
+        [AuthorizeUsers]
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetInt32("idRol") == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
             return View();
         }
 
+        [AuthorizeUsers]
         public IActionResult Privacy()
         {
-            if (HttpContext.Session.GetInt32("idRol") == null)
-            {
-                return RedirectToAction("Denied", "Auth");
-            }
             return View();
         }
 

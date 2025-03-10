@@ -26,6 +26,12 @@ namespace ProyectoBackPeluqueria.Repositories
             return consulta.AsEnumerable().FirstOrDefault();
         }
 
+        public async Task RegisterAsync(Usuario usuario)
+        {
+            _context.Usuarios.Add(usuario);
+            await _context.SaveChangesAsync();
+        }
+
         // Obtener servicios
         public async Task<List<Servicio>> ObtenerServiciosAsync()
         {
@@ -127,7 +133,7 @@ namespace ProyectoBackPeluqueria.Repositories
             {
                 await connection.OpenAsync();
 
-                for (var fecha = fechaInicio; fecha <= fechaFin; fecha = fecha.AddDays(1))
+                for (var fecha = fechaInicio.AddDays(-1); fecha <= fechaFin; fecha = fecha.AddDays(1))
                 {
                     // Saltar sábados y domingos
                     if (fecha.DayOfWeek == DayOfWeek.Saturday || fecha.DayOfWeek == DayOfWeek.Sunday)
