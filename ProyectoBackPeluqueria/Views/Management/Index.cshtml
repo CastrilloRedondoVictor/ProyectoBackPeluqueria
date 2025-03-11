@@ -21,6 +21,9 @@
                 <p class="card-text"><strong>Correo:</strong> @Model.Email</p>
                 <p class="card-text"><strong>Teléfono:</strong> @Model.Telefono</p>
             </div>
+            <div class="card-footer">
+                <a class="btn btn-primary btn-lg" asp-action="Edit" asp-route-id="@Model.Id">Editar Perfil</a>
+            </div>
         </div>
     </div>
 </div>
