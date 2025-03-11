@@ -24,13 +24,12 @@
                     <span>@usuario.Nombre @usuario.Apellidos</span>
                 </div>
                 <div class="icons">
-                    <a asp-action="Edit" asp-route-id="@usuario.Id" class="button">
+                    <a asp-controller="Management" asp-action="Edit" asp-route-id="@usuario.Id" class="button">
                         <i class="fa-solid fa-pen svg-icon"></i>
                     </a>
-                    <a href="javascript:void(0);" onclick="mostrarInfo('@usuario.Id', '@usuario.Nombre @usuario.Apellidos', '@usuario.Email', '@usuario.Telefono')" class="button">
+                    <a asp-controller="Management" asp-action="Index" asp-route-id="@usuario.Id" class="button">
                         <i class="fa-solid fa-info svg-icon"></i>
                     </a>
-
                     <a href="javascript:void(0);" onclick="confirmarEliminacion(@usuario.Id)" class="button">
                         <i class="fa-solid fa-trash-can svg-icon"></i>
                     </a>
@@ -43,16 +42,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    function mostrarInfo(id, nombre, email, telefono) {
-        Swal.fire({
-            title: nombre,
-            html: `<p><strong>Correo:</strong> ${email}</p>
-                   <p><strong>Teléfono:</strong> ${telefono}</p>`,
-            icon: "info",
-            confirmButtonText: "Cerrar",
-            confirmButtonColor: "#c68a54"
-        });
-    }
 
     function confirmarEliminacion(usuarioId) {
         Swal.fire({

@@ -33,12 +33,56 @@ namespace ProyectoBackPeluqueria.Controllers
 
             return View(usuario);
         }
-        //public async Task<IActionResult> EditProfile(int id)
+        public async Task<IActionResult> Edit(int id)
 
-        //{
-        //    Usuario usuario = await _repository.FindUsuario(id);
-        //    return View(usuario);
-        //}
+        {
+            Usuario usuario = await _repository.FindUsuario(id);
+            return View(usuario);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Usuario usuario, string adminCode)
+        {
+            if (!string.IsNullOrEmpty(adminCode) && adminCode == "Taj@mar365")
+            {
+                usuario.IdRolUsuario = 2; // Administrador
+            }
+            else
+            {
+                usuario.IdRolUsuario = 1; // Usuario normal
+            }
+            string iniciales = AuthController.GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
+
+            // Paso 4
+            byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorPelo);
+
+            // Paso 5
+            string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
+
+            // Paso 6
+            if (!Directory.Exists(carpetaAvatar))
+            {
+                Directory.CreateDirectory(carpetaAvatar);
+            }
+
+            // Paso 7
+            string nombreAvatar = $"{Guid.NewGuid()}.png";
+
+            // Paso 8
+            string nombreArchivo = Path.Combine(carpetaAvatar, nombreAvatar);
+
+            // Paso 9
+            System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
+
+            // Paso 10
+            usuario.Imagen = nombreAvatar;
+
+            await _repository.UpdateUsuarioAsync(usuario);
+            return RedirectToAction("Index");
+        }
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> AgregarRangoDisponibilidad(DateTime fechaInicio, DateTime fechaFin)
