@@ -22,8 +22,8 @@ namespace ProyectoBackPeluqueria.Models
         [Column("Email")]
         public string Email { get; set; }
 
-        [Column("ColorPelo")]
-        public string ColorPelo { get; set; }
+        [Column("ColorAvatar")]
+        public string ColorAvatar { get; set; }
 
         [Column("Imagen")]
         public string Imagen { get; set; }

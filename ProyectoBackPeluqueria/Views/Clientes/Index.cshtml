@@ -1,8 +1,8 @@
 ﻿@model List<Usuario>
 
 <div class="text-center">
-    <h1 class="display-3 text-primary">Usuarios</h1>
-    <p class="text-secondary">En ésta página podrás gestionar tus usuarios</p>
+    <h1 class="display-3 text-primary">Clientes</h1>
+    <p class="text-secondary">En ésta página podrás gestionar tus clientes</p>
 </div>
 
 <div class="d-flex justify-content-center mb-4">
@@ -15,26 +15,35 @@
 </div>
 
 <div class="row mt-3">
-    @foreach (var usuario in Model)
+    @if (Model.Count > 0)
     {
-        <div class="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center">
-            <div class="card" data-image="/avatars/@usuario.Imagen">
-                <div class="text">
-                    <p class="subtitle">@usuario.Telefono</p>
-                    <span>@usuario.Nombre @usuario.Apellidos</span>
-                </div>
-                <div class="icons">
-                    <a asp-controller="Management" asp-action="Edit" asp-route-id="@usuario.Id" class="button">
-                        <i class="fa-solid fa-pen svg-icon"></i>
-                    </a>
-                    <a asp-controller="Management" asp-action="Index" asp-route-id="@usuario.Id" class="button">
-                        <i class="fa-solid fa-info svg-icon"></i>
-                    </a>
-                    <a href="javascript:void(0);" onclick="confirmarEliminacion(@usuario.Id)" class="button">
-                        <i class="fa-solid fa-trash-can svg-icon"></i>
-                    </a>
+        @foreach (var usuario in Model)
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center">
+                <div class="card" data-image="/avatars/@usuario.Imagen">
+                    <div class="text">
+                        <p class="subtitle">@usuario.Telefono</p>
+                        <span>@usuario.Nombre @usuario.Apellidos</span>
+                    </div>
+                    <div class="icons">
+                        <a asp-controller="Management" asp-action="Edit" asp-route-id="@usuario.Id" class="button">
+                            <i class="fa-solid fa-pen svg-icon"></i>
+                        </a>
+                        <a asp-controller="Management" asp-action="Index" asp-route-id="@usuario.Id" class="button">
+                            <i class="fa-solid fa-info svg-icon"></i>
+                        </a>
+                        <a href="javascript:void(0);" onclick="confirmarEliminacion(@usuario.Id)" class="button">
+                            <i class="fa-solid fa-trash-can svg-icon"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
+        }
+    }
+    else
+    {
+        <div class="text-center">
+            <p class="text-secondary">Aún no hay clientes.</p>
         </div>
     }
 </div>
@@ -63,7 +72,7 @@
     }
 
     function eliminarUsuario(usuarioId) {
-        fetch(`/Usuarios/Delete/${usuarioId}`, {
+        fetch(`/Clientes/Delete/${usuarioId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

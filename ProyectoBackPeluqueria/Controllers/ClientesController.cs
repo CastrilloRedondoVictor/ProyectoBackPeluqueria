@@ -38,7 +38,7 @@ namespace ProyectoBackPeluqueria.Controllers
             string iniciales = AuthController.GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
             // Paso 4
-            byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorPelo);
+            byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorAvatar);
 
             // Paso 5
             string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
@@ -76,6 +76,13 @@ namespace ProyectoBackPeluqueria.Controllers
         {
             await _repository.UpdateUsuarioAsync(usuario);
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await this._repository.DeleteUsuarioAsync(id);
+            return Ok();
         }
     }
 }

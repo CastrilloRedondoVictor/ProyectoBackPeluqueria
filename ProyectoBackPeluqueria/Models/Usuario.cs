@@ -28,8 +28,8 @@ namespace ProyectoBackPeluqueria.Models
         [Column("Contrasena")]
         public string Contrasena { get; set; }
 
-        [Column("ColorPelo")]
-        public string ColorPelo { get; set; }
+        [Column("ColorAvatar")]
+        public string ColorAvatar { get; set; }
 
         [Column("Imagen")]
         public string Imagen { get; set; }

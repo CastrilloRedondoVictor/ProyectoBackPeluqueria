@@ -54,7 +54,7 @@ namespace ProyectoBackPeluqueria.Controllers
             string iniciales = AuthController.GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
             // Paso 4
-            byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorPelo);
+            byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorAvatar);
 
             // Paso 5
             string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
