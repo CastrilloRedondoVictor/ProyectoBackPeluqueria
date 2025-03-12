@@ -32,8 +32,8 @@
         <tbody>
             @foreach (var reserva in Model)
             {
-                <tr>
-                    @* <td>@reserva.ReservaID</td> *@
+                var esHoy = reserva.FechaHoraInicio.Date == DateTime.Today;
+                <tr class="@(esHoy ? "reserva-hoy" : "")">
                     <td>@reserva.Cliente</td>
                     <td>@reserva.Servicio</td>
                     <td>@reserva.FechaHoraInicio.ToString("yyyy-MM-dd")</td>
@@ -46,6 +46,7 @@
                     </td>
                 </tr>
             }
+
         </tbody>
     </table>
 } else{
@@ -104,3 +105,10 @@
         });
     }
 </script>
+
+<style>
+    .reserva-hoy {
+        background-color: rgba(0, 255, 0, 0.3) !important; /* Fondo verde transparente */
+        font-weight: bold; /* Mantén el texto en negrita */
+    }
+</style>
