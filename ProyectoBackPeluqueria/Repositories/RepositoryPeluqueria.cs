@@ -32,6 +32,13 @@ namespace ProyectoBackPeluqueria.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteUsuarioAsync(int id)
+        {
+            var usuario = await _context.Usuarios.FindAsync(id);
+            _context.Usuarios.Remove(usuario);
+            await _context.SaveChangesAsync();
+        }
+
         // Obtener servicios
         public async Task<List<Servicio>> ObtenerServiciosAsync()
         {
@@ -307,6 +314,13 @@ namespace ProyectoBackPeluqueria.Repositories
             return await _context.CompraDetalles
                 .Where(cd => cd.CompraId == ultimaCompra.Id)
                 .ToListAsync();
+        }
+
+        public async Task EliminarReservaAsync(int reservaId)
+        {
+            var reserva = await _context.Reservas.FindAsync(reservaId);
+            _context.Reservas.Remove(reserva);
+            await _context.SaveChangesAsync();
         }
 
     }

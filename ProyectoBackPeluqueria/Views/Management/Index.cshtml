@@ -7,10 +7,24 @@
     string fechaHoy = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToLongDateString();
 }
 
-<div class="text-center">
-    <h1 class="display-3 text-primary">Bienvenido/a, @User.FindFirstValue(ClaimTypes.Name)</h1>
-    <p class="text-center text-secondary">Aquí puedes ver tus citas y la información de tu perfil</p>
-</div>
+@if (int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) == Model.Id)
+{
+    <div class="text-center">
+        <h1 class="display-3 text-primary">Bienvenido/a, @User.FindFirstValue(ClaimTypes.Name)</h1>
+        <p class="text-center text-secondary">Aquí puedes ver tus citas y la información de tu perfil</p>
+    </div>
+} else {
+    <div class="text-center">
+        <h1 class="display-3 text-primary">Perfil de @Model.Nombre</h1>
+        <p class="text-center text-secondary">Aquí puedes ver sus citas y la información de su perfil</p>
+    </div>
+    <div class="d-flex justify-content-center mb-4">
+        <a asp-controller="Management" asp-action="Index" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="btn btn-secondary mx-2">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </a>
+    </div>
+}
+
 
 <div class="row mb-5">
     <div class="col-12">
@@ -42,6 +56,14 @@
                         <p class="card-text"><strong>Fecha:</strong> @proximaReserva.FechaHoraInicio</p>
                     }
                 </div>
+                @if (proximaReserva != null)
+                {
+                    <div class="card-footer">
+                        <a href="javascript:void(0);" onclick="confirmarEliminacion(@proximaReserva.Id)" class="tect-danger">
+                            <i class="fa-solid fa-trash-can svg-icon text-danger"></i>
+                        </a>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -62,12 +84,12 @@
         <!-- Botones (Cajas) -->
         <div class="col-lg-6 col-md-12 col-sm-12 order-1 order-sm-2">
 
-            <!-- Caja 1: Gestionar Productos (Redirige a una página) -->
+            <!-- Caja 1: Gestionar Reservas (Redirige a una página) -->
             <div class="col-10 offset-1 d-flex justify-content-center mb-4">
-                <a href="/Ruta/De/Tu/Pagina" class="carta">
+                <a asp-controller="Reservas" asp-action="Index" class="carta">
                     <div class="text">
-                        <span>Gestionar Productos</span>
-                        <p class="subtitle">Aquí puedes agregar, editar y eliminar productos.</p>
+                        <span>Gestionar Reservas</span>
+                        <p class="subtitle">Aquí visualizar todas las reservas</p>
                     </div>
                 </a>
             </div>
@@ -159,7 +181,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
             icon: 'warning',
             title: 'Fechas incompletas',
             text: 'Por favor, selecciona ambas fechas.',
-            confirmButtonColor: '#c68a54'
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
           });
           return;
         }
@@ -173,7 +198,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
               icon: 'success',
               title: 'Disponibilidad agregada',
               text: `${response.diasAgregados} días agregados, ${response.diasExistentes} ya existían.`,
-              confirmButtonColor: '#c68a54'
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
             }).then(() => {
               $('#disponibilidadModal').modal('hide');
             });
@@ -183,7 +211,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
               icon: 'error',
               title: 'Error',
               text: 'No se pudo agregar la disponibilidad.',
-              confirmButtonColor: '#c68a54'
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
             });
           }
         });
@@ -204,7 +235,7 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                     data.forEach(function (fecha) {
                         let diaElemento = document.querySelector(`[data-date="${fecha.start}"]`);
                         if (diaElemento) {
-                            diaElemento.style.backgroundColor = 'rgba(0, 255, 0, 0.05)'; // Verde transparente
+                            diaElemento.style.backgroundColor = 'rgba(0, 255, 0, 0.1)'; // Verde transparente
                         }
                     });
                 }, 100);
@@ -326,7 +357,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                         <strong>Hora de fin:</strong> ${new Date(reserva.fechaHoraFin).toLocaleTimeString()}
                     `,
                     icon: "info",
-                    confirmButtonColor: "#c68a54"
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
                 });
             },
             error: function (xhr, status, error) {
@@ -335,7 +369,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                     title: "Error",
                     text: "No se pudo obtener la información de la reserva.",
                     icon: "error",
-                    confirmButtonColor: "#c68a54"
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
                 });
             }
         });
@@ -357,10 +394,12 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
             text: startDate.getDate() == endDate.getDate() ? `Para el día ${startDate.toLocaleDateString()}` : `Desde el ${startDate.toLocaleDateString()} hasta el ${endDate.toLocaleDateString()}`,
             icon: "question",
             showCancelButton: true,
-            confirmButtonColor: "#c68a54",
-            cancelButtonColor: "#d33",
             confirmButtonText: "Sí, agregar",
-            cancelButtonText: "Cancelar"
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 // Convertir las fechas a formato ISO para enviarlas al backend
@@ -377,7 +416,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                             icon: 'success',
                             title: 'Disponibilidad agregada',
                             text: `${response.diasAgregados} días agregados, ${response.diasExistentes} ya existían.`,
-                            confirmButtonColor: '#c68a54'
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
                         }).then(() => {
                             calendar.refetchEvents();
                         });
@@ -387,7 +429,10 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
                             icon: 'error',
                             title: 'Error',
                             text: 'No se pudo agregar la disponibilidad.',
-                            confirmButtonColor: '#c68a54'
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
                         });
                     }
                 });
@@ -429,6 +474,56 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js
         }
     });
     });
+</script>
+
+<script>
+    function confirmarEliminacion(reservaId) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Eliminarás la reserva permanentemente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: '#c68a54', // Color del botón
+            customClass: {
+                 confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                eliminarReserva(reservaId);
+            }
+        });
+    }
+
+    function eliminarReserva(reservaId) {
+        fetch(`/Reservas/Delete/${reservaId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('input[name="__RequestVerificationToken"]')?.value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                Swal.fire({
+                    title: "Reserva eliminada",
+                    icon: "success",
+                    confirmButtonText: "Aceptar",
+                    confirmButtonColor: '#c68a54', // Color del botón
+                    customClass: {
+                        confirmButton: 'swal-btn-custom' // Clase personalizada para el botón
+                    }
+                }).then(() => location.reload()); // Recargar la página después de eliminar
+            } else {
+                Swal.fire("Error", "No se pudo eliminar la reserva.", "error");
+            }
+        })
+        .catch(error => {
+            Swal.fire("Error", "Ocurrió un error inesperado.", "error");
+            console.error("Error al eliminar:", error);
+        });
+    }
 </script>
 
 

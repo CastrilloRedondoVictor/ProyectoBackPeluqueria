@@ -185,5 +185,11 @@ namespace ProyectoBackPeluqueria.Controllers
             await client.SendMailAsync(email);
         }
 
-}
+        public async Task<IActionResult> Delete(int id)
+        {
+            await this._repository.EliminarReservaAsync(id);
+            return RedirectToAction("Index");
+        }
+
+    }
 }
