@@ -125,7 +125,7 @@ namespace ProyectoBackPeluqueria.Repositories
         public async Task<List<ReservaView>> ObtenerReservasClientesAsync()
         {
             return await _context.VistaReservas
-                .FromSqlRaw("SELECT * FROM Vista_Reservas")
+                .FromSqlRaw("SELECT * FROM Vista_Reservas ORDER BY FechaHoraInicio DESC")
                 .ToListAsync();
         }
 
