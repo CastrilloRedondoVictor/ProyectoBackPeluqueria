@@ -35,6 +35,9 @@ namespace ProyectoBackPeluqueria.Controllers
             {
                 usuario.IdRolUsuario = 1; // Usuario normal
             }
+
+            usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
+
             string iniciales = AuthController.GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
             // Paso 4
