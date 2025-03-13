@@ -81,6 +81,11 @@ namespace ProyectoBackPeluqueria.Repositories
             return await _context.Usuarios.FindAsync(usuarioId);
         }
 
+        public async Task<Usuario> GetUsuarioByEmailAsync(string email)
+        {
+            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task UpdateUsuarioAsync(Usuario usuario)
         {
             _context.Usuarios.Update(usuario);
