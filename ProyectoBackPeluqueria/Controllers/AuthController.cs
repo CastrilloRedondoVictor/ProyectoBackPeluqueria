@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using ProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 using System.Drawing.Imaging;
-using System.Drawing;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
@@ -32,10 +31,9 @@ namespace ProyectoBackPeluqueria.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // Verificar si el usuario existe
-            Usuario usuario = await _repository.LoginAsync(email, password);
+            Usuario usuario = await _repository.GetUsuarioByEmailAsync(email);
 
-            if (usuario == null)
+            if (usuario == null || !BCrypt.Net.BCrypt.Verify(password, usuario.Contrasena))
             {
                 ViewData["Error"] = "Credenciales incorrectas";
                 return View();
@@ -83,6 +81,10 @@ namespace ProyectoBackPeluqueria.Controllers
             {
                 usuario.IdRolUsuario = 1; // Usuario normal
             }
+
+            // Encriptar la contraseña antes de guardarla
+            usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
+
             string iniciales = GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
             // Paso 4
