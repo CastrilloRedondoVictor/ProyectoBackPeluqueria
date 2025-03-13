@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
@@ -73,47 +74,35 @@ namespace ProyectoBackPeluqueria.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(Usuario usuario, string adminCode)
         {
-            if (!string.IsNullOrEmpty(adminCode) && adminCode == "Taj@mar365")
-            {
-                usuario.IdRolUsuario = 2; // Administrador
-            }
-            else
-            {
-                usuario.IdRolUsuario = 1; // Usuario normal
-            }
 
-            // Encriptar la contraseña antes de guardarla
+            // Asignar rol
+            usuario.IdRolUsuario = (!string.IsNullOrEmpty(adminCode) && adminCode == "Taj@mar365") ? 2 : 1;
+
+            // Encriptar la contraseña
             usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
 
+            // Generar avatar
             string iniciales = GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
-
-            // Paso 4
             byte[] imagenAvatar = GenerarAvatar(iniciales, usuario.ColorAvatar);
-
-            // Paso 5
             string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
 
-            // Paso 6
             if (!Directory.Exists(carpetaAvatar))
             {
                 Directory.CreateDirectory(carpetaAvatar);
             }
 
-            // Paso 7
             string nombreAvatar = $"{Guid.NewGuid()}.png";
-
-            // Paso 8
             string nombreArchivo = Path.Combine(carpetaAvatar, nombreAvatar);
-
-            // Paso 9
             System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
 
-            // Paso 10
             usuario.Imagen = nombreAvatar;
 
             await _repository.RegisterAsync(usuario);
+
             return RedirectToAction("Login");
         }
+
+
 
         public IActionResult Denied()
         {

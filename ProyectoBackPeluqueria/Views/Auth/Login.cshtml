@@ -12,11 +12,21 @@
         <label for="password" class="form-label">Contraseña</label>
         <input type="password" name="password" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary w-100 mt-3">Iniciar sesión</button>
+    <button type="submit" class="btn btn-primary w-100 mt-3 ">Iniciar sesión</button>
 </form>
-<h4 class="text-danger">@ViewData["error"]</h4>
 
-<a asp-action="Register" class="btn btn-link">¿No tienes una cuenta? Regístrate</a>
+@if (ViewData["error"] != null)
+{
+    <div class="alert alert-danger" role="alert" style="font-size: 0.875rem; background-color: #f8d7da; color: #e74c3c; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px;">
+        <strong>Error:</strong> @ViewData["error"]
+    </div>
+
+}
+
+<a asp-action="Register" class="link-auth">¿No tienes una cuenta? Regístrate</a>
+
+
+
 
 <!-- Agregar algunos estilos adicionales para mejorar la presentación -->
 <style>
