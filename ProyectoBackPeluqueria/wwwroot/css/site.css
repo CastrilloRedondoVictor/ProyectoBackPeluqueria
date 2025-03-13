@@ -20,6 +20,81 @@ body {
     overflow: scroll; /* Habilita el scroll */
 }
 
+.link-auth {
+    color: #dc8a3e;
+    text-decoration: none;
+}
+
+    .link-auth:hover {
+        text-decoration: underline;
+    }
+
+/* Barra (track) gris todo el tiempo */
+.form-range::-webkit-slider-runnable-track {
+    background-color: #b3b3b3; /* Gris todo el tiempo */
+    height: 0.5rem;
+    border-radius: 1rem;
+}
+
+.form-range::-moz-range-track {
+    background-color: #b3b3b3; /* Gris todo el tiempo */
+    height: 0.5rem;
+    border-radius: 1rem;
+}
+
+/* Círculo del deslizador (thumb) siempre naranja */
+.form-range::-webkit-slider-thumb {
+    background-color: #dc8a3e; /* Naranja todo el tiempo */
+    width: 1rem;
+    height: 1rem;
+    border-radius: 1rem;
+    -webkit-appearance: none;
+    appearance: none;
+    border: none; /* Eliminar borde */
+    box-shadow: none; /* Eliminar sombra */
+}
+
+/* Círculo (thumb) siempre naranja en Firefox */
+.form-range::-moz-range-thumb {
+    background-color: #dc8a3e; /* Naranja todo el tiempo */
+    width: 1rem;
+    height: 1rem;
+    border-radius: 1rem;
+    -moz-appearance: none;
+    appearance: none;
+    border: none; /* Eliminar borde */
+    box-shadow: none; /* Eliminar sombra */
+}
+
+.form-range:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+    .form-range:focus::-webkit-slider-thumb {
+        background-color: #dc8a3e; /* Naranja todo el tiempo */
+        box-shadow: none;
+    }
+
+    .form-range:focus::-moz-range-thumb {
+        background-color: #dc8a3e; /* Naranja todo el tiempo */
+        box-shadow: none;
+    }
+
+/* Cuando está deshabilitado */
+.form-range:disabled::-webkit-slider-thumb,
+.form-range:disabled::-moz-range-thumb {
+    background-color: #b3b3b3; /* Gris cuando está deshabilitado */
+}
+
+.form-range:disabled::-webkit-slider-runnable-track,
+.form-range:disabled::-moz-range-track {
+    background-color: #e0e0e0; /* Gris claro cuando está deshabilitado */
+}
+
+
+
+
 @media (max-width: 574px) {
     .logo
 
