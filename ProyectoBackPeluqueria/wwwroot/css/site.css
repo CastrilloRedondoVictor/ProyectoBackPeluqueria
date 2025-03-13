@@ -20,6 +20,15 @@ body {
     overflow: scroll; /* Habilita el scroll */
 }
 
+@media (max-width: 574px) {
+    .logo
+
+{
+    display: none;
+}
+
+}
+
 body::-webkit-scrollbar {
     display: none; /* Oculta la barra de desplazamiento en navegadores WebKit (Chrome, Safari) */
 }
