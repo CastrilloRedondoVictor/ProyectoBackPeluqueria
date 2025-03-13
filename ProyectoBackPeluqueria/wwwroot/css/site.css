@@ -169,9 +169,9 @@ body {
 }
 
 
-
-
-
+.fc .fc-list-event:hover td {
+    background-color: transparent !important;
+}
 /* Asegúrate de que el contenedor de los botones sea flexible */
 .fc-header-toolbar {
     display: flex;
