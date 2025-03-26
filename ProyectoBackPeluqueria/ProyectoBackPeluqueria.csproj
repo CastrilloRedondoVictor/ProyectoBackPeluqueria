@@ -15,4 +15,8 @@
     <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\avatars\" />
+  </ItemGroup>
+
 </Project>
