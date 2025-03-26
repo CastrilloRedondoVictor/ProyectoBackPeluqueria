@@ -77,7 +77,7 @@ namespace ProyectoBackPeluqueria.Controllers
 
             // Asignar rol
             usuario.IdRolUsuario = (!string.IsNullOrEmpty(adminCode) && adminCode == "20Santervas") ? 2 : 1;
-
+             
             // Encriptar la contraseña
             usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
 
