@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ProyectoBackPeluqueria.Data;
-using ProyectoBackPeluqueria.Models;
+using NugetProyectoBackPeluqueria.Models;
 using System.Data;
 
 namespace ProyectoBackPeluqueria.Repositories

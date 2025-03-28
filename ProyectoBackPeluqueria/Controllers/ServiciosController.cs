@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoBackPeluqueria.Filters;
-using ProyectoBackPeluqueria.Models;
+using NugetProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 
 namespace ProyectoBackPeluqueria.Controllers

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProyectoBackPeluqueria.Models;
-
+using NugetProyectoBackPeluqueria.Models;
 namespace ProyectoBackPeluqueria.Data
 {
     public class AppDbContext : DbContext

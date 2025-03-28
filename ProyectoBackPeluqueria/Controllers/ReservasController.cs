@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProyectoBackPeluqueria.Models;
+using NugetProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 using System.Net.Mail;
 using System.Net;

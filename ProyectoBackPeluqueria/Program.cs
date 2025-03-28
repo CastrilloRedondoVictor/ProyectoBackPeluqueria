@@ -2,6 +2,7 @@ using ProyectoBackPeluqueria.Data;
 using ProyectoBackPeluqueria.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using ProyectoBackPeluqueria.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ builder.Services.AddAuthentication(
 builder.Services.AddControllersWithViews();  // Configuración de controladores y vistas
 
 builder.Services.AddTransient<RepositoryPeluqueria>();
+builder.Services.AddTransient<ServicePeluqueria>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlPeluqueria")));
