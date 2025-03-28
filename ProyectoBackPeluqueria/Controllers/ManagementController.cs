@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using ProyectoBackPeluqueria.Models;
+using NugetProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 using ProyectoBackPeluqueria.Filters;
 using System.Security.Claims;

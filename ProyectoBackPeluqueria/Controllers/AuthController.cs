@@ -3,20 +3,21 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using ProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
+using ProyectoBackPeluqueria.Services;
+using NugetProyectoBackPeluqueria.Models;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
     public class AuthController : Controller
     {
-        public RepositoryPeluqueria _repository;
+        public ServicePeluqueria _service;
 
-        public AuthController(RepositoryPeluqueria repository)
+        public AuthController(ServicePeluqueria service)
         {
-            _repository = repository;
+            _service = service;
         }
 
         public IActionResult Index()
@@ -32,24 +33,28 @@ namespace ProyectoBackPeluqueria.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            Usuario usuario = await _repository.GetUsuarioByEmailAsync(email);
+            var result = await _service.LoginAsync(email, password);
 
-            if (usuario == null || !BCrypt.Net.BCrypt.Verify(password, usuario.Contrasena))
+            if (string.IsNullOrEmpty(result.token) || result.user == null)
             {
                 ViewData["Error"] = "Credenciales incorrectas";
                 return View();
             }
 
-            // Crear identidad y claims
+            Usuario usuario = result.user;
+            string token = result.token;
+
+            // Crear claims para la identidad
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, usuario.Nombre ?? ""),
         new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
         new Claim("Imagen", usuario.Imagen ?? ""),
-        new Claim(ClaimTypes.Role, usuario.IdRolUsuario == 2 ? "Admin" : "User") // Definir rol
+        new Claim(ClaimTypes.Role, usuario.IdRolUsuario == 2 ? "Admin" : "User"),
+        new Claim("Token", token) // Guardar el token en los claims (opcional)
     };
 
-            // Crear identidad y principal
+            // Crear la identidad y el principal
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var claimsPrincipal = new ClaimsPrincipal(identity);
 
@@ -57,12 +62,14 @@ namespace ProyectoBackPeluqueria.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal,
                 new AuthenticationProperties
                 {
-                    IsPersistent = true, // Mantiene la sesión activa
-                    ExpiresUtc = DateTime.UtcNow.AddHours(2) // Expira en 2 horas
+                    IsPersistent = true, // Mantener la sesión activa
+                    ExpiresUtc = DateTime.UtcNow.AddHours(1) // Expira en 1 hora
                 });
 
             return RedirectToAction("Index", "Home"); // Redirigir después del login
         }
+
+
 
 
 
@@ -77,7 +84,7 @@ namespace ProyectoBackPeluqueria.Controllers
 
             // Asignar rol
             usuario.IdRolUsuario = (!string.IsNullOrEmpty(adminCode) && adminCode == "20Santervas") ? 2 : 1;
-             
+
             // Encriptar la contraseña
             usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
 
@@ -97,10 +104,17 @@ namespace ProyectoBackPeluqueria.Controllers
 
             usuario.Imagen = nombreAvatar;
 
-            await _repository.RegisterAsync(usuario);
+            bool registrado = await _service.RegisterAsync(usuario);
+
+            if (!registrado)
+            {
+                return View(usuario);
+            }
 
             return RedirectToAction("Login");
         }
+
+
 
 
 

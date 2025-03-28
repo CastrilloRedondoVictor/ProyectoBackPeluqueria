@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoBackPeluqueria.Filters;
-using ProyectoBackPeluqueria.Models;
+using NugetProyectoBackPeluqueria.Models;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
