@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Authentication;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NugetProyectoBackPeluqueria.Models;
 using System.Net.Http;
@@ -11,13 +12,21 @@ namespace ProyectoBackPeluqueria.Services
     {
         private string UrlApi;
         private MediaTypeWithQualityHeaderValue Header;
+        private IHttpContextAccessor HttpContextAccessor;
 
-        public ServicePeluqueria(IConfiguration configuration)
+        public ServicePeluqueria(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             this.UrlApi = configuration.GetValue<string>
             ("ApiUrls:ApiProyectoBackPeluqueria");
             this.Header = new
             MediaTypeWithQualityHeaderValue("application/json");
+            HttpContextAccessor = httpContextAccessor;
+        }
+
+
+        public string GetTokenAsync()
+        {
+            return HttpContextAccessor.HttpContext.User.FindFirst(x => x.Type == "Token").Value;
         }
 
 

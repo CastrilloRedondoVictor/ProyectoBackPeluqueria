@@ -8,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);  // Tiempo de expiración de la sesión
+});
 
 builder.Services.AddAuthentication(
     options =>
@@ -25,6 +28,8 @@ builder.Services.AddAuthentication(
 });
 
 builder.Services.AddControllersWithViews();  // Configuración de controladores y vistas
+
+builder.Services.AddHttpContextAccessor();  // Habilita el acceso al contexto HTTP
 
 builder.Services.AddTransient<RepositoryPeluqueria>();
 builder.Services.AddTransient<ServicePeluqueria>();
