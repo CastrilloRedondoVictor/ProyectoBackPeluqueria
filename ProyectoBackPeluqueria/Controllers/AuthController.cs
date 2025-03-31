@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using ProyectoBackPeluqueria.Services;
 using NugetProyectoBackPeluqueria.Models;
+using Azure.Storage.Files.Shares;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
@@ -102,6 +103,8 @@ namespace ProyectoBackPeluqueria.Controllers
             string nombreArchivo = Path.Combine(carpetaAvatar, nombreAvatar);
             System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
 
+            GuardarImagenAzure();
+
             usuario.Imagen = nombreAvatar;
 
             bool registrado = await _service.RegisterAsync(usuario);
@@ -112,6 +115,12 @@ namespace ProyectoBackPeluqueria.Controllers
             }
 
             return RedirectToAction("Login");
+        }
+
+        public void GuardarImagenAzure()
+        {
+            // Guardar imagen en Azure
+
         }
 
 

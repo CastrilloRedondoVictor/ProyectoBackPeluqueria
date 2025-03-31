@@ -3,7 +3,7 @@
 @{
     string imagen = "";
     if (User.Identity.IsAuthenticated)
-    { 
+    {
         imagen = User.FindFirst("Imagen").Value;
     }
 }
