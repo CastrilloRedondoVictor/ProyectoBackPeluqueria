@@ -5,16 +5,17 @@ using NugetProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
 using ProyectoBackPeluqueria.Filters;
 using System.Security.Claims;
+using ProyectoBackPeluqueria.Services;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
     public class ManagementController : Controller
     {
-        RepositoryPeluqueria _repository;
+        public ServicePeluqueria _service;
 
-        public ManagementController(RepositoryPeluqueria repository)
+        public ManagementController(ServicePeluqueria service)
         {
-            _repository = repository;
+            _service = service;
         }
 
         [AuthorizeUsers]
@@ -24,19 +25,19 @@ namespace ProyectoBackPeluqueria.Controllers
             {
                 id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             }
-            Usuario usuario = await _repository.FindUsuario(id.Value);
+            Usuario usuario = await _service.FindUsuario(id.Value);
 
-            Reserva proximaReserva = await _repository.GetProximaReservaUsuarioAsync(id.Value);
+            Reserva proximaReserva = await _service.GetProximaReservaUsuarioAsync(id.Value);
 
             ViewData["ProximaReserva"] = proximaReserva;
-            ViewData["ServicioProximaReserva"] = proximaReserva != null ? await _repository.GetServicioReservaAsync(proximaReserva.ServicioId) : null;
+            ViewData["ServicioProximaReserva"] = proximaReserva != null ? await _service.GetServicioReservaAsync(proximaReserva.ServicioId) : null;
 
             return View(usuario);
         }
         public async Task<IActionResult> Edit(int id)
 
         {
-            Usuario usuario = await _repository.FindUsuario(id);
+            Usuario usuario = await _service.FindUsuario(id);
             return View(usuario);
         }
 
@@ -77,7 +78,7 @@ namespace ProyectoBackPeluqueria.Controllers
             // Paso 10
             usuario.Imagen = nombreAvatar;
 
-            await _repository.UpdateUsuarioAsync(usuario);
+            await _service.UpdateUsuarioAsync(usuario);
             return RedirectToAction("Index");
         }
 
@@ -94,7 +95,7 @@ namespace ProyectoBackPeluqueria.Controllers
 
             try
             {
-                var resultado = await _repository.AgregarDisponibilidadRangoAsync(fechaInicio, fechaFin);
+                var resultado = await _service.AgregarDisponibilidadRangoAsync(fechaInicio, fechaFin);
 
                 return Ok(new
                 {
@@ -114,7 +115,7 @@ namespace ProyectoBackPeluqueria.Controllers
             var eventos = new List<object>();
 
             // Obtener citas con fecha y hora de inicio y fin
-            var citas = await _repository.ObtenerCitasConHoras();
+            var citas = await _service.ObtenerCitasConHoras();
 
             // Añadir cada cita al evento, incluyendo la fecha de inicio, fecha de fin y el servicio
             eventos.AddRange(citas.Select(c => new
@@ -137,14 +138,14 @@ namespace ProyectoBackPeluqueria.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerDiasDisponibles()
         {
-            var diasDisponibles = await _repository.ObtenerDiasDisponibles();
+            var diasDisponibles = await _service.ObtenerDiasDisponibles();
             return Json(diasDisponibles.Select(d => new { start = d.ToString("yyyy-MM-dd") }));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDetallesReserva(int id)
         {
-            var reserva = await _repository.FindReservaAsync(id);
+            var reserva = await _service.FindReservaAsync(id);
             if (reserva == null)
             {
                 return NotFound();
