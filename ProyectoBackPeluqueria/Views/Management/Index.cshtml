@@ -9,154 +9,161 @@
     string fechaHoy = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToLongDateString();
 }
 
-@if (int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) == Model.Id)
-{
-    <div class="text-center">
-        <h1 class="display-3 text-primary">Bienvenido/a, @User.FindFirstValue(ClaimTypes.Name)</h1>
-        <p class="text-center text-secondary">Aquí puedes ver tus citas y la información de tu perfil</p>
-    </div>
-} else {
-    <div class="text-center">
-        <h1 class="display-3 text-primary">Perfil de @Model.Nombre</h1>
-        <p class="text-center text-secondary">Aquí puedes ver sus citas y la información de su perfil</p>
-    </div>
-    <div class="d-flex justify-content-center mb-4">
-        <a asp-controller="Management" asp-action="Index" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="btn btn-secondary mx-2">
-            <i class="fa-solid fa-arrow-left"></i> Volver
-        </a>
-    </div>
-}
-
-
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="card shadow-lg rounded" style="background-color: rgba(220, 138, 62, 0.1); border: 1px solid rgba(220, 138, 62, 0.3);">
-            <div class="card-body">
-                <h5 class="card-title" style="color: #dc8a3e;">Información de perfil</h5>
-                <p class="card-text"><strong>Nombre:</strong> @Model.Nombre @Model.Apellidos</p>
-                <p class="card-text"><strong>Correo:</strong> @Model.Email</p>
-                <p class="card-text"><strong>Teléfono:</strong> @Model.Telefono</p>
-            </div>
-            <div class="card-footer">
-                <a class="btn btn-primary btn-lg" asp-action="Edit" asp-route-id="@Model.Id">Editar Perfil</a>
-            </div>
+@if(Model != null) {
+    @if (int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) == Model.Id)
+    {
+        <div class="text-center">
+            <h1 class="display-3 text-primary">Bienvenido/a, @User.FindFirstValue(ClaimTypes.Name)</h1>
+            <p class="text-center text-secondary">Aquí puedes ver tus citas y la información de tu perfil</p>
         </div>
-    </div>
-</div>
+    }
+    else
+    {
+        <div class="text-center">
+            <h1 class="display-3 text-primary">Perfil de @Model.Nombre</h1>
+            <p class="text-center text-secondary">Aquí puedes ver sus citas y la información de su perfil</p>
+        </div>
+        <div class="d-flex justify-content-center mb-4">
+            <a asp-controller="Management" asp-action="Index" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="btn btn-secondary mx-2">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    }
 
-@if(Model.IdRolUsuario == 1) {
+
     <div class="row mb-5">
         <div class="col-12">
             <div class="card shadow-lg rounded" style="background-color: rgba(220, 138, 62, 0.1); border: 1px solid rgba(220, 138, 62, 0.3);">
                 <div class="card-body">
-                    @if (proximaReserva == null)
+                    <h5 class="card-title" style="color: #dc8a3e;">Información de perfil</h5>
+                    <p class="card-text"><strong>Nombre:</strong> @Model.Nombre @Model.Apellidos</p>
+                    <p class="card-text"><strong>Correo:</strong> @Model.Email</p>
+                    <p class="card-text"><strong>Teléfono:</strong> @Model.Telefono</p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-primary btn-lg" asp-action="Edit" asp-route-id="@Model.Id">Editar Perfil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IdRolUsuario == 1)
+    {
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card shadow-lg rounded" style="background-color: rgba(220, 138, 62, 0.1); border: 1px solid rgba(220, 138, 62, 0.3);">
+                    <div class="card-body">
+                        @if (proximaReserva == null)
+                        {
+                            <h5 class="card-title" style="color: #dc8a3e;">No tienes reservas a futuro, si quieres reservar, pincha <a class="linkNueva" asp-controller="Reservas" asp-action="Create">aquí</a></h5>
+                        }
+                        else
+                        {
+                            <h5 class="card-title" style="color: #dc8a3e;">Próxima reserva</h5>
+                            <p class="card-text"><strong>Servicio:</strong> @servicioProximaReserva</p>
+                            <p class="card-text"><strong>Fecha:</strong> @proximaReserva.FechaHoraInicio</p>
+                        }
+                    </div>
+                    @if (proximaReserva != null)
                     {
-                        <h5 class="card-title" style="color: #dc8a3e;">No tienes reservas a futuro, si quieres reservar, pincha <a class="linkNueva" asp-controller="Reservas" asp-action="Create">aquí</a></h5>
-                    } else {
-                        <h5 class="card-title" style="color: #dc8a3e;">Próxima reserva</h5>
-                        <p class="card-text"><strong>Servicio:</strong> @servicioProximaReserva</p>
-                        <p class="card-text"><strong>Fecha:</strong> @proximaReserva.FechaHoraInicio</p>
+                        <div class="card-footer">
+                            <a href="javascript:void(0);" onclick="confirmarEliminacion(@proximaReserva.Id)" class="tect-danger">
+                                <i class="fa-solid fa-trash-can svg-icon text-danger"></i>
+                            </a>
+                        </div>
                     }
                 </div>
-                @if (proximaReserva != null)
-                {
-                    <div class="card-footer">
-                        <a href="javascript:void(0);" onclick="confirmarEliminacion(@proximaReserva.Id)" class="tect-danger">
-                            <i class="fa-solid fa-trash-can svg-icon text-danger"></i>
-                        </a>
-                    </div>
-                }
             </div>
         </div>
-    </div>
-}
+    }
 
 
 
-@if (User.IsInRole("Admin") && Model.IdRolUsuario == 2)
-{
-    <div class="row mt-3">
+    @if (User.IsInRole("Admin") && Model.IdRolUsuario == 2)
+    {
+        <div class="row mt-3">
 
-        <!-- Calendario: Aparece después de los botones en dispositivos móviles -->
-        <div class="col-lg-6 col-md-12 col-sm-12 mb-5 order-2 order-sm-1">
-            <h3 class="text-center text-primary">Hoy es @fechaHoy</h3>
-            <div id="calendar" class="border rounded shadow-sm p-3"></div>
-        </div>
-
-        <!-- Botones (Cajas) -->
-        <div class="col-lg-6 col-md-12 col-sm-12 order-1 order-sm-2">
-
-            <!-- Caja 1: Gestionar Reservas (Redirige a una página) -->
-            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
-                <a asp-controller="Reservas" asp-action="Index" class="carta">
-                    <div class="text">
-                        <span>Gestionar Reservas</span>
-                        <p class="subtitle">Aquí visualizar todas las reservas</p>
-                    </div>
-                </a>
+            <!-- Calendario: Aparece después de los botones en dispositivos móviles -->
+            <div class="col-lg-6 col-md-12 col-sm-12 mb-5 order-2 order-sm-1">
+                <h3 class="text-center text-primary">Hoy es @fechaHoy</h3>
+                <div id="calendar" class="border rounded shadow-sm p-3"></div>
             </div>
 
-            <!-- Caja 2: Gestionar Servicios (Abre un Modal) -->
-            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
-                <a asp-controller="Servicios" asp-action="Index" class="carta">
-                    <div class="text">
-                        <span>Gestionar Servicios</span>
-                        <p class="subtitle">Gestiona todos los servicios que ofreces.</p>
-                    </div>
-                </a>
-            </div>
+            <!-- Botones (Cajas) -->
+            <div class="col-lg-6 col-md-12 col-sm-12 order-1 order-sm-2">
 
-            <!-- Caja 3: Gestionar Clientes (Redirige a una página) -->
-            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
-                <a asp-controller="Clientes" asp-action="Index" class="carta">
-                    <div class="text">
-                        <span>Gestionar Clientes</span>
-                        <p class="subtitle">Consulta y edita la información de tus clientes.</p>
-                    </div>
-                </a>
-            </div>
+                <!-- Caja 1: Gestionar Reservas (Redirige a una página) -->
+                <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                    <a asp-controller="Reservas" asp-action="Index" class="carta">
+                        <div class="text">
+                            <span>Gestionar Reservas</span>
+                            <p class="subtitle">Aquí visualizar todas las reservas</p>
+                        </div>
+                    </a>
+                </div>
 
-            <!-- Caja 4: Agregar Disponibilidad (Abre un Modal) -->
-            <div class="col-10 offset-1 d-flex justify-content-center mb-4">
-                <div data-bs-toggle="modal" data-bs-target="#disponibilidadModal" class="carta">
-                    <div class="text">
-                        <span>Agregar disponibilidad</span>
-                        <p class="subtitle">Agrega tu disponibilidad para los servicios.</p>
+                <!-- Caja 2: Gestionar Servicios (Abre un Modal) -->
+                <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                    <a asp-controller="Servicios" asp-action="Index" class="carta">
+                        <div class="text">
+                            <span>Gestionar Servicios</span>
+                            <p class="subtitle">Gestiona todos los servicios que ofreces.</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Caja 3: Gestionar Clientes (Redirige a una página) -->
+                <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                    <a asp-controller="Clientes" asp-action="Index" class="carta">
+                        <div class="text">
+                            <span>Gestionar Clientes</span>
+                            <p class="subtitle">Consulta y edita la información de tus clientes.</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Caja 4: Agregar Disponibilidad (Abre un Modal) -->
+                <div class="col-10 offset-1 d-flex justify-content-center mb-4">
+                    <div data-bs-toggle="modal" data-bs-target="#disponibilidadModal" class="carta">
+                        <div class="text">
+                            <span>Agregar disponibilidad</span>
+                            <p class="subtitle">Agrega tu disponibilidad para los servicios.</p>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
+    }
 
+
+    <!-- Modal -->
+    <div class="modal fade" id="disponibilidadModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Agregar Disponibilidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formDisponibilidad">
+                        <div class="mb-3">
+                            <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaFin" class="form-label">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
 }
-
-
-<!-- Modal -->
-<div class="modal fade" id="disponibilidadModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Agregar Disponibilidad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formDisponibilidad">
-                    <div class="mb-3">
-                        <label for="fechaInicio" class="form-label">Fecha Inicio</label>
-                        <input type="date" class="form-control" id="fechaInicio" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fechaFin" class="form-label">Fecha Fin</label>
-                        <input type="date" class="form-control" id="fechaFin" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Agregar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 
 <!-- Cargar jQuery primero -->

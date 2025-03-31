@@ -27,8 +27,15 @@ namespace ProyectoBackPeluqueria.Services
 
         public string GetToken()
         {
-            return HttpContextAccessor.HttpContext.User.FindFirst(x => x.Type == "Token").Value;
+            // Verifica si el token existe en los claims
+            var token = HttpContextAccessor.HttpContext.User.FindFirst(x => x.Type == "Token")?.Value;
+
+            // Si el token es null o vacío, puedes imprimirlo para depuración
+            Console.WriteLine($"Token: {token}");
+
+            return token;
         }
+
 
 
         public async Task<T> CallApiAsync<T>(string request, HttpMethod method, object data = null)
@@ -126,13 +133,13 @@ namespace ProyectoBackPeluqueria.Services
 
         public async Task<bool> UpdateUsuarioAsync(Usuario usuario)
         {
-            var response = await CallApiAsync<bool>("api/auth/UpdateUsuario", HttpMethod.Put, usuario);
+            var response = await CallApiAsync<bool>("api/management/UpdateUsuario", HttpMethod.Put, usuario);
             return response;
         }
 
         public async Task<Usuario> FindUsuario(int id)
         {
-            var response = await CallApiAsync<Usuario>($"api/auth/GetPerfil/{id}", HttpMethod.Get);
+            var response = await CallApiAsync<Usuario>($"api/management/GetPerfil/{id}", HttpMethod.Get);
             return response;
         }
 
