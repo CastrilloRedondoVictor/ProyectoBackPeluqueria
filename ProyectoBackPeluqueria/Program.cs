@@ -3,8 +3,15 @@ using ProyectoBackPeluqueria.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ProyectoBackPeluqueria.Services;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
+
+string azureKeys = builder.Configuration["AzureKeys:StorageAccount"];
+
+BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
+
+builder.Services.AddTransient<BlobServiceClient>(sp => blobServiceClient);
 
 // Add services to the container.
 builder.Services.AddDistributedMemoryCache();
@@ -33,6 +40,7 @@ builder.Services.AddHttpContextAccessor();  // Habilita el acceso al contexto HT
 
 builder.Services.AddTransient<RepositoryPeluqueria>();
 builder.Services.AddTransient<ServicePeluqueria>();
+builder.Services.AddTransient<ServiceStorageBlobs>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlPeluqueria")));

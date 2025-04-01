@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NugetProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
+using ProyectoBackPeluqueria.Services;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
     public class ClientesController : Controller
     {
         RepositoryPeluqueria _repository;
+        ServiceStorageBlobs _serviceBlobs;
 
-        public ClientesController(RepositoryPeluqueria repository)
+        public ClientesController(RepositoryPeluqueria repository, ServiceStorageBlobs serviceStorageBlobs)
         {
             _repository = repository;
+            _serviceBlobs = serviceStorageBlobs;
         }
 
         public async Task<IActionResult> Index()
@@ -40,28 +43,12 @@ namespace ProyectoBackPeluqueria.Controllers
 
             string iniciales = AuthController.GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
-            // Paso 4
             byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorAvatar);
 
-            // Paso 5
-            string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
-
-            // Paso 6
-            if (!Directory.Exists(carpetaAvatar))
-            {
-                Directory.CreateDirectory(carpetaAvatar);
-            }
-
-            // Paso 7
             string nombreAvatar = $"{Guid.NewGuid()}.png";
 
-            // Paso 8
-            string nombreArchivo = Path.Combine(carpetaAvatar, nombreAvatar);
+            await _serviceBlobs.UploadBlobAsync("avatars", nombreAvatar, new MemoryStream(imagenAvatar));
 
-            // Paso 9
-            System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
-
-            // Paso 10
             usuario.Imagen = nombreAvatar;
 
             await _repository.RegisterAsync(usuario);

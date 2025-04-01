@@ -15,10 +15,12 @@ namespace ProyectoBackPeluqueria.Controllers
     public class AuthController : Controller
     {
         public ServicePeluqueria _service;
+        public ServiceStorageBlobs _serviceBlobs;
 
-        public AuthController(ServicePeluqueria service)
+        public AuthController(ServicePeluqueria service, ServiceStorageBlobs serviceStorageBlobs)
         {
             _service = service;
+            _serviceBlobs = serviceStorageBlobs;
         }
 
         public IActionResult Index()
@@ -89,21 +91,13 @@ namespace ProyectoBackPeluqueria.Controllers
             // Encriptar la contraseña
             usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
 
-            // Generar avatar
             string iniciales = GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
-            byte[] imagenAvatar = GenerarAvatar(iniciales, usuario.ColorAvatar);
-            string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
 
-            if (!Directory.Exists(carpetaAvatar))
-            {
-                Directory.CreateDirectory(carpetaAvatar);
-            }
+            byte[] imagenAvatar = GenerarAvatar(iniciales, usuario.ColorAvatar);
 
             string nombreAvatar = $"{Guid.NewGuid()}.png";
-            string nombreArchivo = Path.Combine(carpetaAvatar, nombreAvatar);
-            System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
 
-            GuardarImagenAzure();
+            await _serviceBlobs.UploadBlobAsync("avatars", nombreAvatar, new MemoryStream(imagenAvatar));
 
             usuario.Imagen = nombreAvatar;
 
@@ -116,15 +110,6 @@ namespace ProyectoBackPeluqueria.Controllers
 
             return RedirectToAction("Login");
         }
-
-        public void GuardarImagenAzure()
-        {
-            // Guardar imagen en Azure
-
-        }
-
-
-
 
 
         public IActionResult Denied()
