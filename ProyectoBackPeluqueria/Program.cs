@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ProyectoBackPeluqueria.Services;
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.Configuration;
+using NugetProyectoBackPeluqueria.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -56,23 +56,12 @@ namespace ProyectoBackPeluqueria.Controllers
             }
             string iniciales = AuthController.GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
-            // Paso 4
             byte[] imagenAvatar = AuthController.GenerarAvatar(iniciales, usuario.ColorAvatar);
 
-            // Paso 5
-            string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
-
-            // Paso 6
-            if (!Directory.Exists(carpetaAvatar))
-            {
-                Directory.CreateDirectory(carpetaAvatar);
-            }
-
-            // Paso 7
             string nombreAvatar = $"{Guid.NewGuid()}.png";
 
+            await _serviceBlobs.UploadBlobAsync("avatars", nombreAvatar, new MemoryStream(imagenAvatar));
 
-            // Paso 10
             usuario.Imagen = nombreAvatar;
 
             await _service.UpdateUsuarioAsync(usuario);

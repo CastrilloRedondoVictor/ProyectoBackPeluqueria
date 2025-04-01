@@ -102,10 +102,6 @@ namespace ProyectoBackPeluqueria.Controllers
 
             usuario.Imagen = nombreAvatar;
 
-
-
-            usuario.Imagen = nombreAvatar;
-
             bool registrado = await _service.RegisterAsync(usuario);
 
             if (!registrado)

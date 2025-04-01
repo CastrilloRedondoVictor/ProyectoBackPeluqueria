@@ -168,7 +168,7 @@ namespace ProyectoBackPeluqueria.Services
 
         public async Task<(int diasAgregados, int diasExistentes)> AgregarDisponibilidadRangoAsync(DateTime fechaInicio, DateTime fechaFin)
         {
-            var response = await CallApiAsync<(int diasAgregados, int diasExistentes)>($"api/reservas/AgregarDisponibilidadRango?fechaInicio={fechaInicio}&fechaFin={fechaFin}", HttpMethod.Post);
+            var response = await CallApiAsync<(int diasAgregados, int diasExistentes)>($"api/reservas/AgregarDisponibilidadRango/{fechaInicio}/{fechaFin}", HttpMethod.Post);
             return response;
 
         }

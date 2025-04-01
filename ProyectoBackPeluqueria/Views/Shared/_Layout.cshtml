@@ -1,10 +1,13 @@
 ﻿@using System.Security.Claims
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
 
 @{
     string imagen = "";
     if (User.Identity.IsAuthenticated)
     { 
-        imagen = User.FindFirst("Imagen").Value;
+        imagen = Configuration.GetValue<string>("AzureUrls:AvatarsContainer") + User.FindFirst("Imagen").Value;
     }
 }
 <!DOCTYPE html>
@@ -21,6 +24,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet">
 </head>
 <body>
+
+    <p>Imagen URL: @imagen</p>
+
 
     @if (User.Identity.IsAuthenticated){
         <header>
@@ -51,7 +57,7 @@
                         @if (imagen != null && imagen != "")
                         {
                             <div class="ms-auto logo">
-                                <img src="~/avatars/@imagen" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px;" />
+                                <img src="@imagen" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px;" />
                             </div>
                         }
                     </div>

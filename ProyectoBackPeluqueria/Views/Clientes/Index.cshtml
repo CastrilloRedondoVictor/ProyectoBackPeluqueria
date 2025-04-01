@@ -1,6 +1,12 @@
 ﻿@using NugetProyectoBackPeluqueria.Models
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 
 @model List<Usuario>
+
+    @{
+        string imagenUrl = Configuration.GetValue<string>("AzureUrls:AvatarsContainer");
+    }
 
 <div class="text-center">
     <h1 class="display-3 text-primary">Clientes</h1>
@@ -26,7 +32,7 @@
         @foreach (var usuario in Model)
         {
             <div class="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center" id="cliente-card" data-nombre="@usuario.Nombre @usuario.Apellidos">
-                <div class="card" data-image="/avatars/@usuario.Imagen">
+                <div class="card" data-image="@imagenUrl@usuario.Imagen">
                     <div class="text">
                         <p class="subtitle">@usuario.Telefono</p>
                         <span>@usuario.Nombre @usuario.Apellidos</span>
