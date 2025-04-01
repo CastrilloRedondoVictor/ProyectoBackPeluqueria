@@ -91,6 +91,7 @@ namespace ProyectoBackPeluqueria.Controllers
             // Encriptar la contraseña
             usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
 
+            // Generar avatar
             string iniciales = GetIniciales(usuario.Nombre + " " + usuario.Apellidos);
 
             byte[] imagenAvatar = GenerarAvatar(iniciales, usuario.ColorAvatar);
@@ -98,6 +99,10 @@ namespace ProyectoBackPeluqueria.Controllers
             string nombreAvatar = $"{Guid.NewGuid()}.png";
 
             await _serviceBlobs.UploadBlobAsync("avatars", nombreAvatar, new MemoryStream(imagenAvatar));
+
+            usuario.Imagen = nombreAvatar;
+
+
 
             usuario.Imagen = nombreAvatar;
 
@@ -110,6 +115,9 @@ namespace ProyectoBackPeluqueria.Controllers
 
             return RedirectToAction("Login");
         }
+
+
+
 
 
         public IActionResult Denied()

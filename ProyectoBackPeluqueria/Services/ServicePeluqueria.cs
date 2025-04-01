@@ -170,6 +170,7 @@ namespace ProyectoBackPeluqueria.Services
         {
             var response = await CallApiAsync<(int diasAgregados, int diasExistentes)>($"api/reservas/AgregarDisponibilidadRango?fechaInicio={fechaInicio}&fechaFin={fechaFin}", HttpMethod.Post);
             return response;
+
         }
 
         public async Task<List<(DateTime FechaInicio, DateTime FechaFin, string Servicio, int ReservaId)>> ObtenerCitasConHoras()
