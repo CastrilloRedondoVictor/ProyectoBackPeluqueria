@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NugetProyectoBackPeluqueria.Models;
@@ -147,7 +148,20 @@ namespace ProyectoBackPeluqueria.Services
 
 
 
-
+        public async Task InsertarReservaAsync(int clienteId, int servicioId, DateTime fechaHoraInicio)
+        {
+            var reserva = new Reserva
+            {
+                ClienteId = clienteId,
+                ServicioId = servicioId,
+                FechaHoraInicio = fechaHoraInicio
+            };
+            var response = await CallApiAsync<bool>("api/reservas/InsertarReserva", HttpMethod.Post, reserva);
+        }
+        public async Task DeleteReserva(int id)
+        {
+            var response = await CallApiAsync<bool>($"api/reservas/DeleteReserva/{id}", HttpMethod.Delete);
+        }
         public async Task<Reserva> FindReservaAsync(int id)
         {
             var response = await CallApiAsync<Reserva>($"api/reservas/FindReserva/{id}", HttpMethod.Get);
@@ -183,6 +197,59 @@ namespace ProyectoBackPeluqueria.Services
         {
             var response = await CallApiAsync<List<DateTime>>("api/reservas/ObtenerDiasDisponibles", HttpMethod.Get);
             return response;
+        }
+
+        public async Task<List<ReservaView>> ObtenerReservasClientesAsync()
+        {
+            var response = await CallApiAsync<List<ReservaView>>("api/reservas/ObtenerReservasClientes", HttpMethod.Get);
+            return response;
+        }
+
+        public async Task<List<HorarioDisponible>> ObtenerHorariosDisponiblesPorFechaAsync(int servicioId, DateTime fecha)
+        {
+            var response = await CallApiAsync<List<HorarioDisponible>>($"api/reservas/ObtenerHorariosDisponiblesPorFecha/{servicioId}/{fecha}", HttpMethod.Get);
+            return response;
+        }
+
+
+
+
+
+
+        public async Task<List<Usuario>> GetClientesAsync()
+        {
+            var response = await CallApiAsync<List<Usuario>>("api/clientes/GetClientes", HttpMethod.Get);
+            return response;
+        }
+
+        public async Task DeleteUsuarioAsync(int id)
+        {
+            var response = await CallApiAsync<bool>($"api/clientes/DeleteUsuario/{id}", HttpMethod.Delete);
+        }
+
+
+
+        public async Task<List<Servicio>> GetServiciosAsync()
+        {
+            var response = await CallApiAsync<List<Servicio>>("api/servicios/GetServicios", HttpMethod.Get);
+            return response;
+        }
+        public async Task<Servicio> FindServicioAsync(int id)
+        {
+            var response = await CallApiAsync<Servicio>($"api/servicios/FindServicio/{id}", HttpMethod.Get);
+            return response;
+        }
+        public async Task InsertarServicioAsync(Servicio servicio)
+        {
+            var response = await CallApiAsync<bool>("api/servicios/InsertarServicio", HttpMethod.Post, servicio);
+        }
+        public async Task UpdateServicioAsync(Servicio servicio)
+        {
+            var response = await CallApiAsync<bool>("api/servicios/UpdateServicio", HttpMethod.Put, servicio);
+        }
+        public async Task DeleteServicioAsync(int id)
+        {
+            var response = await CallApiAsync<bool>($"api/servicios/DeleteServicio/{id}", HttpMethod.Delete);
         }
     }
 }

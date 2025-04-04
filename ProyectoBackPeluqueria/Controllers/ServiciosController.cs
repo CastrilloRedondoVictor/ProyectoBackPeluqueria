@@ -3,22 +3,23 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoBackPeluqueria.Filters;
 using NugetProyectoBackPeluqueria.Models;
 using ProyectoBackPeluqueria.Repositories;
+using ProyectoBackPeluqueria.Services;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
     public class ServiciosController : Controller
     {
-        RepositoryPeluqueria _repository;
+        ServicePeluqueria _service;
 
-        public ServiciosController(RepositoryPeluqueria repository)
+        public ServiciosController(ServicePeluqueria service)
         {
-            this._repository = repository;
+            _service = service;
         }
 
         [AuthorizeUsers]
         public async Task<IActionResult> Index()
         {
-            List<Servicio> servicios = await this._repository.GetServiciosAsync();
+            List<Servicio> servicios = await this._service.GetServiciosAsync();
             return View(servicios);
         }
 
@@ -39,7 +40,7 @@ namespace ProyectoBackPeluqueria.Controllers
                     var precioTexto = Request.Form["Precio"].ToString().Replace(",", ".");
                     servicio.Precio = decimal.Parse(precioTexto, System.Globalization.CultureInfo.InvariantCulture);
 
-                    await this._repository.InsertarServicioAsync(servicio);
+                    await this._service.InsertarServicioAsync(servicio);
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -53,7 +54,7 @@ namespace ProyectoBackPeluqueria.Controllers
         [AuthorizeUsers]
         public async Task<IActionResult> Edit(int id)
         {
-            Servicio servicio = await this._repository.FindServicioAsync(id);
+            Servicio servicio = await this._service.FindServicioAsync(id);
             return View(servicio);
         }
 
@@ -68,7 +69,7 @@ namespace ProyectoBackPeluqueria.Controllers
                     var precioTexto = Request.Form["Precio"].ToString().Replace(",", ".");
                     servicio.Precio = decimal.Parse(precioTexto, System.Globalization.CultureInfo.InvariantCulture);
 
-                    await this._repository.ActualizarServicioAsync(servicio);
+                    await this._service.UpdateServicioAsync(servicio);
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -82,7 +83,7 @@ namespace ProyectoBackPeluqueria.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            await this._repository.EliminarServicioAsync(id);
+            await this._service.DeleteServicioAsync(id);
             return RedirectToAction("Index");
         }
     }

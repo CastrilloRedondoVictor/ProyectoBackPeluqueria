@@ -7,18 +7,18 @@ namespace ProyectoBackPeluqueria.Controllers
 {
     public class ClientesController : Controller
     {
-        RepositoryPeluqueria _repository;
+        ServicePeluqueria _service;
         ServiceStorageBlobs _serviceBlobs;
 
-        public ClientesController(RepositoryPeluqueria repository, ServiceStorageBlobs serviceStorageBlobs)
+        public ClientesController(ServicePeluqueria service, ServiceStorageBlobs serviceStorageBlobs)
         {
-            _repository = repository;
+            _service = service;
             _serviceBlobs = serviceStorageBlobs;
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Usuario> clientes = await _repository.GetClientesAsync();
+            List<Usuario> clientes = await _service.GetClientesAsync();
             return View(clientes);
         }
 
@@ -51,27 +51,27 @@ namespace ProyectoBackPeluqueria.Controllers
 
             usuario.Imagen = nombreAvatar;
 
-            await _repository.RegisterAsync(usuario);
+            await _service.RegisterAsync(usuario);
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            Usuario usuario = await _repository.FindUsuario(id);
+            Usuario usuario = await _service.FindUsuario(id);
             return View(usuario);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(Usuario usuario)
         {
-            await _repository.UpdateUsuarioAsync(usuario);
+            await _service.UpdateUsuarioAsync(usuario);
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await this._repository.DeleteUsuarioAsync(id);
+            await this._service.DeleteUsuarioAsync(id);
             return Ok();
         }
     }

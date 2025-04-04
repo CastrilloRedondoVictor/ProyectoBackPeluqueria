@@ -5,25 +5,26 @@ using System.Net.Mail;
 using System.Net;
 using System.Runtime.Intrinsics.X86;
 using ProyectoBackPeluqueria.Filters;
+using ProyectoBackPeluqueria.Services;
 
 namespace ProyectoBackPeluqueria.Controllers
 {
     public class ReservasController : Controller
     {
 
-        private RepositoryPeluqueria _repository;
+        private ServicePeluqueria _service;
         private IConfiguration _configuration;
 
-        public ReservasController(RepositoryPeluqueria repository, IConfiguration configuration)
+        public ReservasController(ServicePeluqueria service, IConfiguration configuration)
         {
-            _repository = repository;
+            _service = service;
             _configuration = configuration;
         }
 
         [AuthorizeUsers]
         public async Task<IActionResult> Index()
         {
-            var reservas = await _repository.ObtenerReservasClientesAsync();
+            var reservas = await _service.ObtenerReservasClientesAsync();
             return View(reservas);
         }
 
@@ -31,8 +32,8 @@ namespace ProyectoBackPeluqueria.Controllers
         [AuthorizeUsers]
         public async Task<IActionResult> Create()
         {
-            var clientes = await _repository.GetClientesAsync();
-            var servicios = await _repository.ObtenerServiciosAsync();
+            var clientes = await _service.GetClientesAsync();
+            var servicios = await _service.GetServiciosAsync();
             ViewData["Clientes"] = clientes;
             return View(servicios);
         }
@@ -43,7 +44,7 @@ namespace ProyectoBackPeluqueria.Controllers
         public async Task<IActionResult> ObtenerHorariosDisponibles(int servicioId, string fecha)
         {
             var fechaDate = DateTime.Parse(fecha); // Convertir el string de fecha a DateTime
-            var horarios = await _repository.ObtenerHorariosDisponiblesPorFechaAsync(servicioId, fechaDate);
+            var horarios = await _service.ObtenerHorariosDisponiblesPorFechaAsync(servicioId, fechaDate);
 
             var horariosDisponibles = horarios.Where(h => h.Disponible).Select(h => new
             {
@@ -60,10 +61,10 @@ namespace ProyectoBackPeluqueria.Controllers
     public async Task<IActionResult> InsertarReserva(int clienteId, int servicioId, string fechaHoraInicio)
     {
         var fechaHora = DateTime.Parse(fechaHoraInicio);
-        await _repository.InsertarReservaAsync(clienteId, servicioId, fechaHora);
+        await _service.InsertarReservaAsync(clienteId, servicioId, fechaHora);
 
-        Usuario cliente = await _repository.FindUsuario(clienteId);
-        Servicio servicio = await _repository.FindServicioAsync(servicioId);
+        Usuario cliente = await _service.FindUsuario(clienteId);
+        Servicio servicio = await _service.FindServicioAsync(servicioId);
 
         await SendEmailAsync(cliente, servicio, fechaHora);
 
@@ -187,7 +188,7 @@ namespace ProyectoBackPeluqueria.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            await this._repository.EliminarReservaAsync(id);
+            await this._service.DeleteReserva(id);
             return RedirectToAction("Index");
         }
 
