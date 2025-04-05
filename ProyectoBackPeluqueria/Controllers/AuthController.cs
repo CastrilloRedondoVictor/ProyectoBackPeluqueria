@@ -44,7 +44,7 @@ namespace ProyectoBackPeluqueria.Controllers
                 return View();
             }
 
-            Usuario usuario = result.user;
+            var usuario = result.user;
             string token = result.token;
 
             // Crear claims para la identidad

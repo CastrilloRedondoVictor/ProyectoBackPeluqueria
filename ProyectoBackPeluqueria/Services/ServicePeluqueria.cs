@@ -64,6 +64,9 @@ namespace ProyectoBackPeluqueria.Services
 
                 HttpResponseMessage response = await client.SendAsync(httpRequest);
 
+                // Imprimir el resultado de la respuesta para depuración
+                Console.WriteLine($"Response: {response.StatusCode}");
+
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsAsync<T>();
@@ -148,9 +151,9 @@ namespace ProyectoBackPeluqueria.Services
 
 
 
-        public async Task InsertarReservaAsync(int clienteId, int servicioId, DateTime fechaHoraInicio)
+        public async Task InsertarReservaAsync(int clienteId, int servicioId, string fechaHoraInicio)
         {
-            var reserva = new Reserva
+            var reserva = new ReservaModel
             {
                 ClienteId = clienteId,
                 ServicioId = servicioId,
@@ -180,11 +183,15 @@ namespace ProyectoBackPeluqueria.Services
             return response;
         }
 
-        public async Task<(int diasAgregados, int diasExistentes)> AgregarDisponibilidadRangoAsync(DateTime fechaInicio, DateTime fechaFin)
+        public async Task<DisponibilidadResponse> AgregarDisponibilidadRangoAsync(DateTime fechaInicio, DateTime fechaFin)
         {
-            var response = await CallApiAsync<(int diasAgregados, int diasExistentes)>($"api/reservas/AgregarDisponibilidadRango/{fechaInicio}/{fechaFin}", HttpMethod.Post);
+            AgregarDisponibilidadModel body = new AgregarDisponibilidadModel
+            {
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin
+            };
+            var response = await CallApiAsync<DisponibilidadResponse>($"api/reservas/AgregarDisponibilidadRango", HttpMethod.Post, body);
             return response;
-
         }
 
         public async Task<List<(DateTime FechaInicio, DateTime FechaFin, string Servicio, int ReservaId)>> ObtenerCitasConHoras()
@@ -205,9 +212,9 @@ namespace ProyectoBackPeluqueria.Services
             return response;
         }
 
-        public async Task<List<HorarioDisponible>> ObtenerHorariosDisponiblesPorFechaAsync(int servicioId, DateTime fecha)
+        public async Task<List<HorarioDisponible>> ObtenerHorariosDisponiblesPorFechaAsync(int servicioId, string fecha)
         {
-            var response = await CallApiAsync<List<HorarioDisponible>>($"api/reservas/ObtenerHorariosDisponiblesPorFecha/{servicioId}/{fecha}", HttpMethod.Get);
+            var response = await CallApiAsync<List<HorarioDisponible>>($"api/reservas/ObtenerHorariosDisponiblesPorFecha/{servicioId}", HttpMethod.Post, fecha);
             return response;
         }
 

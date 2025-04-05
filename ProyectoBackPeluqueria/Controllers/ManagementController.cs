@@ -81,13 +81,9 @@ namespace ProyectoBackPeluqueria.Controllers
 
             try
             {
-                var resultado = await _service.AgregarDisponibilidadRangoAsync(fechaInicio, fechaFin);
+                DisponibilidadResponse response = await _service.AgregarDisponibilidadRangoAsync(fechaInicio, fechaFin);
 
-                return Ok(new
-                {
-                    diasAgregados = resultado.diasAgregados,
-                    diasExistentes = resultado.diasExistentes
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {

@@ -43,8 +43,8 @@ namespace ProyectoBackPeluqueria.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerHorariosDisponibles(int servicioId, string fecha)
         {
-            var fechaDate = DateTime.Parse(fecha); // Convertir el string de fecha a DateTime
-            var horarios = await _service.ObtenerHorariosDisponiblesPorFechaAsync(servicioId, fechaDate);
+             // Convertir el string de fecha a DateTime
+            var horarios = await _service.ObtenerHorariosDisponiblesPorFechaAsync(servicioId, fecha);
 
             var horariosDisponibles = horarios.Where(h => h.Disponible).Select(h => new
             {
@@ -60,13 +60,13 @@ namespace ProyectoBackPeluqueria.Controllers
 [HttpPost]
     public async Task<IActionResult> InsertarReserva(int clienteId, int servicioId, string fechaHoraInicio)
     {
-        var fechaHora = DateTime.Parse(fechaHoraInicio);
-        await _service.InsertarReservaAsync(clienteId, servicioId, fechaHora);
+        await _service.InsertarReservaAsync(clienteId, servicioId, fechaHoraInicio);
 
         Usuario cliente = await _service.FindUsuario(clienteId);
         Servicio servicio = await _service.FindServicioAsync(servicioId);
 
-        await SendEmailAsync(cliente, servicio, fechaHora);
+            var fechaHora = DateTime.Parse(fechaHoraInicio);
+            await SendEmailAsync(cliente, servicio, fechaHora);
 
         return Ok();
     }
