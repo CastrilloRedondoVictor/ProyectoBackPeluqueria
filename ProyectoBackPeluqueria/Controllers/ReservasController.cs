@@ -188,7 +188,7 @@ namespace ProyectoBackPeluqueria.Controllers
             //await client.SendMailAsync(email);
 
             // Variables necesarias (ajústalas según lo que uses)
-            string connectionString = _configuration.GetValue<string>("AzureKeys:EmailAccount");
+            string connectionString = _configuration.GetValue<string>("AzureUrls:EmailAccount");
             var emailClient = new EmailClient(connectionString);
 
             // Aquí defines tu HTML como un string interpolado si quieres usar variables dinámicas

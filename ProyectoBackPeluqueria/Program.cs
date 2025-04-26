@@ -6,12 +6,24 @@ using ProyectoBackPeluqueria.Services;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using NugetProyectoBackPeluqueria.Models;
+using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string azureKeys = builder.Configuration["AzureKeys:StorageAccount"];
+builder.Services.AddAzureClients(factory =>
+{
+    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
+});
 
-BlobServiceClient blobServiceClient = new BlobServiceClient(azureKeys);
+SecretClient secretClient = builder.Services.BuildServiceProvider()
+                                            .GetRequiredService<SecretClient>();
+
+KeyVaultSecret secretConnectionString = await secretClient.GetSecretAsync("sqlpeluqueria");
+KeyVaultSecret secretStorageAccount = await secretClient.GetSecretAsync("storageaccount");
+
+
+BlobServiceClient blobServiceClient = new BlobServiceClient(secretStorageAccount.Value);
 
 builder.Services.AddTransient<BlobServiceClient>(sp => blobServiceClient);
 
@@ -45,7 +57,7 @@ builder.Services.AddTransient<ServicePeluqueria>();
 builder.Services.AddTransient<ServiceStorageBlobs>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlPeluqueria")));
+    options.UseSqlServer(secretConnectionString.Value));
 
 var app = builder.Build();
 
